@@ -323,7 +323,91 @@
 .save-btn:hover{
     background:#2d5b91;
 }
+/* EXPORT BUTTON */
 
+.export-btn{
+    background:#27ae60;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    transition:0.3s;
+}
+
+.export-btn:hover{
+    background:#1e8449;
+}
+
+/* PDF BUTTON */
+
+.pdf-btn{
+    background:#e74c3c;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    transition:0.3s;
+}
+
+.pdf-btn:hover{
+    background:#c0392b;
+}
+/* ===================================
+   PRINT STYLES
+=================================== */
+
+/* ===================================
+   PRINT STYLES
+=================================== */
+
+@media print {
+
+    body{
+        background:white;
+        zoom:75%;
+    }
+
+    header,
+    .controls,
+    footer,
+    .action-btn,
+    .edit-btn,
+    .delete-btn{
+        display:none !important;
+    }
+
+    .table-section{
+        width:100%;
+        margin:0;
+        overflow:visible;
+    }
+
+    table{
+        width:100%;
+        table-layout:fixed;
+        border-collapse:collapse;
+        font-size:10px;
+        box-shadow:none;
+    }
+
+    table th,
+    table td{
+        border:1px solid #999;
+        padding:5px;
+        word-wrap:break-word;
+        white-space:normal;
+    }
+
+    table th{
+        background:#ddd !important;
+        color:black !important;
+    }
+
+}
     </style>
 
 </head>
@@ -380,7 +464,19 @@
             >
 
         </div>
+        <!-- EXPORT EXCEL BUTTON -->
+        <button class="export-btn" onclick="exportCSV()">
 
+    <i class="fa-solid fa-file-excel"></i>
+    Export Excel
+
+     </button>
+     <button class="pdf-btn" onclick="printPDF()">
+
+    <i class="fa-solid fa-file-pdf"></i>
+    Download PDF
+
+    </button>
         <!-- FILTER -->
 
         <div class="filter-box">

@@ -481,3 +481,81 @@ if (statusFilter) {
 // ==========================================
 
 displayFarmers();
+// ==========================================
+// EXPORT CSV / EXCEL
+// ==========================================
+
+function exportCSV() {
+
+    let farmers =
+        JSON.parse(localStorage.getItem("farmers")) || [];
+
+    // NO DATA
+
+    if (farmers.length === 0) {
+
+        alert("No farmer data available!");
+
+        return;
+    }
+
+    // CSV HEADERS
+
+    let csv =
+        "Farmer Name,Phone,Village,Work Type,Input Date,Step1 Date,Step2 Date,Mutation Date,Step3 Date,Approved Date,Status,Remarks\n";
+
+    // ADD FARMER DATA
+
+    farmers.forEach(farmer => {
+
+        csv +=
+            `"${farmer.farmerName}",` +
+            `"${farmer.phone}",` +
+            `"${farmer.village}",` +
+            `"${farmer.workType}",` +
+            `"${farmer.inputDate}",` +
+            `"${farmer.step1Date}",` +
+            `"${farmer.step2Date}",` +
+            `"${farmer.mutationDate}",` +
+            `"${farmer.step3Date}",` +
+            `"${farmer.approvedDate}",` +
+            `"${farmer.status}",` +
+            `"${farmer.remarks}"\n`;
+
+    });
+
+    // CREATE FILE
+
+    const blob =
+        new Blob([csv], { type: "text/csv" });
+
+    const url =
+        window.URL.createObjectURL(blob);
+
+    // CREATE DOWNLOAD LINK
+
+    const a =
+        document.createElement("a");
+
+    a.href = url;
+
+    a.download = "Farmer_Records.csv";
+
+    // DOWNLOAD FILE
+
+    a.click();
+
+    // CLEANUP
+
+    window.URL.revokeObjectURL(url);
+
+}
+// ==========================================
+// PRINT / PDF DOWNLOAD
+// ==========================================
+
+function printPDF() {
+
+    window.print();
+
+}
