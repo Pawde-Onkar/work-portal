@@ -480,7 +480,7 @@ if (statusFilter) {
 // INITIAL LOAD
 // ==========================================
 
-displayFarmers();
+
 // ==========================================
 // EXPORT CSV / EXCEL
 // ==========================================
@@ -559,3 +559,143 @@ function printPDF() {
     window.print();
 
 }
+// ==========================================
+// NOTIFICATION SYSTEM
+// ==========================================
+
+const delays = {
+
+    step1: 0,
+    step2: 0,
+    mutation: 0,
+    step3: 0
+
+};
+
+
+// ==========================================
+// CHECK NOTIFICATIONS
+// ==========================================
+
+function checkNotifications() {
+
+    const container =
+        document.getElementById("notificationContainer");
+
+    // STOP IF PAGE NOT AVAILABLE
+
+    if (!container) return;
+
+    // CLEAR OLD
+
+    container.innerHTML = "";
+
+    let farmers =
+        JSON.parse(localStorage.getItem("farmers")) || [];
+
+    const today =
+        new Date();
+
+    farmers.forEach(farmer => {
+
+        // STEP 1 → STEP 2
+
+        if (
+            farmer.step1Date &&
+            !farmer.step2Date
+        ) {
+
+            const step1 =
+                new Date(farmer.step1Date);
+
+            const diffDays =
+                (today - step1) /
+                (1000 * 60 * 60 * 24);
+
+            if (diffDays >= delays.step1) {
+
+                container.innerHTML += `
+
+                    <div class="notification-card">
+
+                        <strong>
+                            ${farmer.farmerName}
+                        </strong>
+
+                        is ready for Step 2 Process.
+
+                    </div>
+
+                `;
+            }
+        }
+
+        // STEP 2 → MUTATION
+
+        if (
+            farmer.step2Date &&
+            !farmer.mutationDate
+        ) {
+
+            const step2 =
+                new Date(farmer.step2Date);
+
+            const diffDays =
+                (today - step2) /
+                (1000 * 60 * 60 * 24);
+
+            if (diffDays >= delays.step2) {
+
+                container.innerHTML += `
+
+                    <div class="notification-card">
+
+                        <strong>
+                            ${farmer.farmerName}
+                        </strong>
+
+                        is ready for Mutation Process.
+
+                    </div>
+
+                `;
+            }
+        }
+
+        // MUTATION → STEP 3
+
+        if (
+            farmer.mutationDate &&
+            !farmer.step3Date
+        ) {
+
+            const mutation =
+                new Date(farmer.mutationDate);
+
+            const diffDays =
+                (today - mutation) /
+                (1000 * 60 * 60 * 24);
+
+            if (diffDays >= delays.mutation) {
+
+                container.innerHTML += `
+
+                    <div class="notification-card">
+
+                        <strong>
+                            ${farmer.farmerName}
+                        </strong>
+
+                        is ready for Step 3 Process.
+
+                    </div>
+
+                `;
+            }
+        }
+
+    });
+
+}
+displayFarmers();
+checkNotifications();
