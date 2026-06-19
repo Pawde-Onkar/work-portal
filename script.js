@@ -1,3 +1,16 @@
+import { db }
+from "./firebase.js";
+
+import {
+    collection,
+    addDoc,
+    getDocs,
+    getDoc,
+    doc,
+    updateDoc,
+    deleteDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 // ==========================================
 // GET FORM
 // ==========================================
@@ -11,9 +24,12 @@ const farmerForm = document.getElementById("farmerForm");
 
 if (farmerForm) {
 
-    farmerForm.addEventListener("submit", function (e) {
+    farmerForm.addEventListener("submit", async function (e) {
 
         e.preventDefault();
+        if (!validateDateOrder()) {
+    return;
+}
 console.log("Form Submitted");
         // CREATE FARMER OBJECT
 
@@ -49,27 +65,25 @@ console.log("Form Submitted");
 
         // GET OLD DATA
 
-        let farmers =
-            JSON.parse(localStorage.getItem("farmers")) || [];
+      try {
 
-        // ADD NEW FARMER
+    await addDoc(
+        collection(db, "farmers"),
+        farmer
+    );
 
-        farmers.push(farmer);
+    alert("Farmer Data Saved Successfully!");
 
-        // SAVE TO LOCAL STORAGE
+    window.location.href = "gpt.html";
 
-        localStorage.setItem(
-            "farmers",
-            JSON.stringify(farmers)
-        );
+}
+catch(error){
 
-        // SUCCESS MESSAGE
+    console.error(error);
 
-        alert("Farmer Data Saved Successfully!");
-        window.location.href = "gpt.html";
-        // RESET FORM
+    alert("Error saving farmer data!");
 
-        farmerForm.reset();
+}
 
     });
 
@@ -130,7 +144,7 @@ function getStatus() {
 // DISPLAY FARMERS
 // ==========================================
 
-function displayFarmers() {
+async function displayFarmers() {
 
     const tableBody =
         document.getElementById("tableBody");
@@ -141,8 +155,24 @@ function displayFarmers() {
 
     // GET FARMERS
 
-    let farmers =
-        JSON.parse(localStorage.getItem("farmers")) || [];
+  const snapshot =
+    await getDocs(
+        collection(db, "farmers")
+    );
+
+let farmers = [];
+
+snapshot.forEach(doc => {
+
+    farmers.push({
+
+        firestoreId: doc.id,
+
+        ...doc.data()
+
+    });
+
+});
 
     // SEARCH VALUE
 
@@ -258,14 +288,14 @@ function displayFarmers() {
 
                     <button 
                         class="action-btn edit-btn"
-                        onclick="editFarmer(${farmer.id})"
+                       onclick="editFarmer('${farmer.firestoreId}')"
                     >
                         Edit
                     </button>
 
                     <button 
                         class="action-btn delete-btn"
-                        onclick="deleteFarmer(${farmer.id})"
+                        onclick="deleteFarmer('${farmer.firestoreId}')"
                     >
                         Delete
                     </button>
@@ -284,43 +314,59 @@ function displayFarmers() {
 // GLOBAL EDIT ID
 // ==========================================
 
-let currentEditId = null;
+
 
 
 // ==========================================
 // OPEN EDIT MODAL
 // ==========================================
 
-function editFarmer(id) {
+let currentFarmer = null;
+let currentEditId = null;
 
-    let farmers =
-        JSON.parse(localStorage.getItem("farmers")) || [];
+async function editFarmer(id) {
 
-    const farmer =
-        farmers.find(f => f.id === id);
+    const docRef =
+        doc(db, "farmers", id);
+
+    const docSnap =
+        await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+
+        alert("Farmer not found!");
+
+        return;
+
+    }
+
+    currentFarmer = {
+
+        firestoreId: docSnap.id,
+
+        ...docSnap.data()
+
+    };
 
     currentEditId = id;
 
-    // FILL INPUTS
-
     document.getElementById("editStep1").value =
-        farmer.step1Date || "";
+        currentFarmer.step1Date || "";
 
     document.getElementById("editStep2").value =
-        farmer.step2Date || "";
+        currentFarmer.step2Date || "";
 
     document.getElementById("editMutation").value =
-        farmer.mutationDate || "";
+        currentFarmer.mutationDate || "";
 
     document.getElementById("editStep3").value =
-        farmer.step3Date || "";
+        currentFarmer.step3Date || "";
 
     document.getElementById("editApproved").value =
-        farmer.approvedDate || "";
+        currentFarmer.approvedDate || "";
 
-    // SHOW MODAL
-
-    document.getElementById("editModal").style.display = "block";
+    document.getElementById("editModal").style.display =
+        "block";
 
 }
 
@@ -339,79 +385,72 @@ function closeModal() {
 // ==========================================
 // SAVE EDIT
 // ==========================================
+async function saveEdit() {
 
-function saveEdit() {
+    if (!validateEditDates()) {
+        return;
+    }
 
-    let farmers =
-        JSON.parse(localStorage.getItem("farmers")) || [];
+    const updatedData = {
 
-    const farmer =
-        farmers.find(f => f.id === currentEditId);
+        step1Date:
+            document.getElementById("editStep1").value,
 
-    // UPDATE VALUES
+        step2Date:
+            document.getElementById("editStep2").value,
 
-    farmer.step1Date =
-        document.getElementById("editStep1").value;
+        mutationDate:
+            document.getElementById("editMutation").value,
 
-    farmer.step2Date =
-        document.getElementById("editStep2").value;
+        step3Date:
+            document.getElementById("editStep3").value,
 
-    farmer.mutationDate =
-        document.getElementById("editMutation").value;
+        approvedDate:
+            document.getElementById("editApproved").value
 
-    farmer.step3Date =
-        document.getElementById("editStep3").value;
+    };
 
-    farmer.approvedDate =
-        document.getElementById("editApproved").value;
+    if (updatedData.approvedDate) {
 
-    // UPDATE STATUS
-
-    if (farmer.approvedDate) {
-
-        farmer.status = "Approved";
+        updatedData.status = "Approved";
 
     }
 
-    else if (farmer.step3Date) {
+    else if (updatedData.step3Date) {
 
-        farmer.status = "Step 3 Completed";
-
-    }
-
-    else if (farmer.step2Date) {
-
-        farmer.status = "Step 2 Completed";
+        updatedData.status = "Step 3 Completed";
 
     }
 
-    else if (farmer.step1Date) {
+    else if (updatedData.step2Date) {
 
-        farmer.status = "Step 1 Completed";
+        updatedData.status = "Step 2 Completed";
+
+    }
+
+    else if (updatedData.step1Date) {
+
+        updatedData.status = "Step 1 Completed";
 
     }
 
     else {
 
-        farmer.status = "Pending";
+        updatedData.status = "Pending";
 
     }
 
-    // SAVE AGAIN
+    await updateDoc(
 
-    localStorage.setItem(
-        "farmers",
-        JSON.stringify(farmers)
+        doc(db, "farmers", currentEditId),
+
+        updatedData
+
     );
-
-    // CLOSE MODAL
 
     closeModal();
 
-    // REFRESH TABLE
-
     displayFarmers();
-
 }
 
 
@@ -419,26 +458,18 @@ function saveEdit() {
 // DELETE FARMER
 // ==========================================
 
-function deleteFarmer(id) {
+async function deleteFarmer(id) {
 
     const confirmDelete =
         confirm("Delete this farmer record?");
 
     if (!confirmDelete) return;
 
-    let farmers =
-        JSON.parse(localStorage.getItem("farmers")) || [];
-
-    farmers =
-        farmers.filter(f => f.id !== id);
-
-    localStorage.setItem(
-        "farmers",
-        JSON.stringify(farmers)
+    await deleteDoc(
+        doc(db, "farmers", id)
     );
 
     displayFarmers();
-
 }
 
 
@@ -485,10 +516,26 @@ if (statusFilter) {
 // EXPORT CSV / EXCEL
 // ==========================================
 
-function exportCSV() {
+async function exportCSV() {
 
-    let farmers =
-        JSON.parse(localStorage.getItem("farmers")) || [];
+    const snapshot =
+        await getDocs(
+            collection(db, "farmers")
+        );
+
+    let farmers = [];
+
+    snapshot.forEach(doc => {
+
+        farmers.push({
+
+            firestoreId: doc.id,
+
+            ...doc.data()
+
+        });
+
+    });
 
     // NO DATA
 
@@ -509,43 +556,41 @@ function exportCSV() {
     farmers.forEach(farmer => {
 
         csv +=
-            `"${farmer.farmerName}",` +
-            `"${farmer.phone}",` +
-            `"${farmer.village}",` +
-            `"${farmer.workType}",` +
-            `"${farmer.inputDate}",` +
-            `"${farmer.step1Date}",` +
-            `"${farmer.step2Date}",` +
-            `"${farmer.mutationDate}",` +
-            `"${farmer.step3Date}",` +
-            `"${farmer.approvedDate}",` +
-            `"${farmer.status}",` +
-            `"${farmer.remarks}"\n`;
+            `"${farmer.farmerName || ""}",` +
+            `"${farmer.phone || ""}",` +
+            `"${farmer.village || ""}",` +
+            `"${farmer.workType || ""}",` +
+            `"${farmer.inputDate || ""}",` +
+            `"${farmer.step1Date || ""}",` +
+            `"${farmer.step2Date || ""}",` +
+            `"${farmer.mutationDate || ""}",` +
+            `"${farmer.step3Date || ""}",` +
+            `"${farmer.approvedDate || ""}",` +
+            `"${farmer.status || ""}",` +
+            `"${farmer.remarks || ""}"\n`;
 
     });
 
     // CREATE FILE
 
     const blob =
-        new Blob([csv], { type: "text/csv" });
+        new Blob(
+            [csv],
+            { type: "text/csv" }
+        );
 
     const url =
         window.URL.createObjectURL(blob);
-
-    // CREATE DOWNLOAD LINK
 
     const a =
         document.createElement("a");
 
     a.href = url;
 
-    a.download = "Farmer_Records.csv";
-
-    // DOWNLOAD FILE
+    a.download =
+        "Farmer_Records.csv";
 
     a.click();
-
-    // CLEANUP
 
     window.URL.revokeObjectURL(url);
 
@@ -576,22 +621,35 @@ const delays = {
 // ==========================================
 // CHECK NOTIFICATIONS
 // ==========================================
-
-function checkNotifications() {
+async function checkNotifications() {
 
     const container =
-        document.getElementById("notificationContainer");
-
-    // STOP IF PAGE NOT AVAILABLE
+        document.getElementById(
+            "notificationContainer"
+        );
 
     if (!container) return;
 
-    // CLEAR OLD
-
     container.innerHTML = "";
 
-    let farmers =
-        JSON.parse(localStorage.getItem("farmers")) || [];
+    const snapshot =
+        await getDocs(
+            collection(db, "farmers")
+        );
+
+    let farmers = [];
+
+    snapshot.forEach(doc => {
+
+        farmers.push({
+
+            firestoreId: doc.id,
+
+            ...doc.data()
+
+        });
+
+    });
 
     const today =
         new Date();
@@ -606,13 +664,17 @@ function checkNotifications() {
         ) {
 
             const step1 =
-                new Date(farmer.step1Date);
+                new Date(
+                    farmer.step1Date
+                );
 
             const diffDays =
                 (today - step1) /
                 (1000 * 60 * 60 * 24);
 
-            if (diffDays >= delays.step1) {
+            if (
+                diffDays >= delays.step1
+            ) {
 
                 container.innerHTML += `
 
@@ -638,13 +700,17 @@ function checkNotifications() {
         ) {
 
             const step2 =
-                new Date(farmer.step2Date);
+                new Date(
+                    farmer.step2Date
+                );
 
             const diffDays =
                 (today - step2) /
                 (1000 * 60 * 60 * 24);
 
-            if (diffDays >= delays.step2) {
+            if (
+                diffDays >= delays.step2
+            ) {
 
                 container.innerHTML += `
 
@@ -670,13 +736,17 @@ function checkNotifications() {
         ) {
 
             const mutation =
-                new Date(farmer.mutationDate);
+                new Date(
+                    farmer.mutationDate
+                );
 
             const diffDays =
                 (today - mutation) /
                 (1000 * 60 * 60 * 24);
 
-            if (diffDays >= delays.mutation) {
+            if (
+                diffDays >= delays.mutation
+            ) {
 
                 container.innerHTML += `
 
@@ -693,9 +763,427 @@ function checkNotifications() {
                 `;
             }
         }
+        // STEP 3 → APPROVAL
+
+if (
+    farmer.step3Date &&
+    !farmer.approvedDate
+) {
+
+    const step3 =
+        new Date(
+            farmer.step3Date
+        );
+
+    const diffDays =
+        (today - step3) /
+        (1000 * 60 * 60 * 24);
+
+    if (
+        diffDays >= delays.step3
+    ) {
+
+        container.innerHTML += `
+
+            <div class="notification-card">
+
+                <strong>
+                    ${farmer.farmerName}
+                </strong>
+
+                is ready for Approval Process.
+
+            </div>
+
+        `;
+    }
+}
 
     });
 
 }
-displayFarmers();
-checkNotifications();
+// ==========================================
+// ==========================================
+// DATE ORDER VALIDATION
+// ==========================================
+
+function validateDateOrder() {
+
+    const inputDate =
+        document.getElementById("inputDate").value;
+
+    const step1Date =
+        document.getElementById("step1Date").value;
+
+    const step2Date =
+        document.getElementById("step2Date").value;
+
+    const mutationDate =
+        document.getElementById("mutationDate").value;
+
+    const step3Date =
+        document.getElementById("step3Date").value;
+
+    const approvedDate =
+        document.getElementById("approvedDate").value;
+
+
+    if (
+        step1Date &&
+        new Date(step1Date) < new Date(inputDate)
+    ) {
+        alert("Step 1 Date cannot be before Input Date.");
+        return false;
+    }
+
+    if (
+        step2Date &&
+        new Date(step2Date) < new Date(step1Date)
+    ) {
+        alert("Step 2 Date cannot be before Step 1 Date.");
+        return false;
+    }
+
+    if (
+        mutationDate &&
+        new Date(mutationDate) < new Date(step2Date)
+    ) {
+        alert("Mutation Date cannot be before Step 2 Date.");
+        return false;
+    }
+
+    if (
+        step3Date &&
+        new Date(step3Date) < new Date(mutationDate)
+    ) {
+        alert("Step 3 Date cannot be before Mutation Date.");
+        return false;
+    }
+
+    if (
+        approvedDate &&
+        new Date(approvedDate) < new Date(step3Date)
+    ) {
+        alert("Approved Date cannot be before Step 3 Date.");
+        return false;
+    }
+
+    return true;
+}
+// ==========================================
+// EDIT DATE VALIDATION
+// ==========================================
+
+function validateEditDates() {
+
+    const step1 =
+        document.getElementById("editStep1").value;
+
+    const step2 =
+        document.getElementById("editStep2").value;
+
+    const mutation =
+        document.getElementById("editMutation").value;
+
+    const step3 =
+        document.getElementById("editStep3").value;
+
+    const approved =
+        document.getElementById("editApproved").value;
+
+    if (
+        step1 &&
+        step2 &&
+        new Date(step2) < new Date(step1)
+    ) {
+        alert("Step 2 Date cannot be before Step 1 Date.");
+        return false;
+    }
+
+    if (
+        step2 &&
+        mutation &&
+        new Date(mutation) < new Date(step2)
+    ) {
+        alert("Mutation Date cannot be before Step 2 Date.");
+        return false;
+    }
+
+    if (
+        mutation &&
+        step3 &&
+        new Date(step3) < new Date(mutation)
+    ) {
+        alert("Step 3 Date cannot be before Mutation Date.");
+        return false;
+    }
+
+    if (
+        step3 &&
+        approved &&
+        new Date(approved) < new Date(step3)
+    ) {
+        alert("Approved Date cannot be before Step 3 Date.");
+        return false;
+    }
+
+    return true;
+}
+// ==========================================
+// EDIT MODAL DATE CHAIN
+// ==========================================
+
+const editStep1 =
+    document.getElementById("editStep1");
+
+const editStep2 =
+    document.getElementById("editStep2");
+
+const editMutation =
+    document.getElementById("editMutation");
+
+const editStep3 =
+    document.getElementById("editStep3");
+
+const editApproved =
+    document.getElementById("editApproved");
+
+if (editStep1) {
+
+    editStep1.addEventListener("change", () => {
+
+        editStep2.min = editStep1.value;
+
+    });
+
+    editStep2.addEventListener("change", () => {
+
+        editMutation.min = editStep2.value;
+
+    });
+
+    editMutation.addEventListener("change", () => {
+
+        editStep3.min = editMutation.value;
+
+    });
+
+    editStep3.addEventListener("change", () => {
+
+        editApproved.min = editStep3.value;
+
+    });
+
+}
+// ==========================================
+// ADD FARMER DATE CHAIN
+// ==========================================
+
+const inputDate = document.getElementById("inputDate");
+const step1Date = document.getElementById("step1Date");
+const step2Date = document.getElementById("step2Date");
+const mutationDate = document.getElementById("mutationDate");
+const step3Date = document.getElementById("step3Date");
+const approvedDate = document.getElementById("approvedDate");
+
+if (inputDate) {
+
+    inputDate.addEventListener("change", () => {
+        step1Date.min = inputDate.value;
+    });
+
+    step1Date.addEventListener("change", () => {
+        step2Date.min = step1Date.value;
+    });
+
+    step2Date.addEventListener("change", () => {
+        mutationDate.min = step2Date.value;
+    });
+
+    mutationDate.addEventListener("change", () => {
+        step3Date.min = mutationDate.value;
+    });
+
+    step3Date.addEventListener("change", () => {
+        approvedDate.min = step3Date.value;
+    });
+
+}
+// ==========================================
+// BACKUP DATA
+// ==========================================
+
+async function backupData() {
+
+    const snapshot =
+        await getDocs(
+            collection(db, "farmers")
+        );
+
+    let farmers = [];
+
+    snapshot.forEach(doc => {
+
+        farmers.push({
+
+            ...doc.data()
+
+        });
+
+    });
+
+    if (farmers.length === 0) {
+
+        alert("No data available for backup!");
+
+        return;
+
+    }
+
+    const jsonData =
+        JSON.stringify(
+            farmers,
+            null,
+            2
+        );
+
+    const blob =
+        new Blob(
+            [jsonData],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const a =
+        document.createElement("a");
+
+    a.href = url;
+
+    const today =
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+    a.download =
+        `farmers_backup_${today}.json`;
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+}// ==========================================
+// RESTORE DATA
+// ==========================================
+
+const restoreFile =
+    document.getElementById("restoreFile");
+
+if (restoreFile) {
+
+    restoreFile.addEventListener("change", restoreData);
+
+}
+
+
+function restoreData(event) {
+
+    const file =
+        event.target.files[0];
+
+    // NO FILE
+
+    if (!file) return;
+
+    const reader =
+        new FileReader();
+
+    reader.onload = async function(e) {
+
+    try {
+
+        const farmers =
+            JSON.parse(
+                e.target.result
+            );
+
+        if (
+            !Array.isArray(
+                farmers
+            )
+        ) {
+
+            alert(
+                "Invalid backup file!"
+            );
+
+            return;
+
+        }
+
+        const confirmRestore =
+            confirm(
+                "Restore backup data?"
+            );
+
+        if (!confirmRestore)
+            return;
+
+        for (
+            const farmer
+            of farmers
+        ) {
+
+            await addDoc(
+
+                collection(
+                    db,
+                    "farmers"
+                ),
+
+                farmer
+
+            );
+
+        }
+
+        alert(
+            "Backup Restored Successfully!"
+        );
+
+        location.reload();
+
+    }
+
+    catch(error) {
+
+        console.error(
+            error
+        );
+
+        alert(
+            "Invalid backup file!"
+        );
+
+    }
+
+};
+
+    reader.readAsText(file);
+
+}
+
+
+window.editFarmer = editFarmer;
+window.deleteFarmer = deleteFarmer;
+window.saveEdit = saveEdit;
+window.closeModal = closeModal;
+window.exportCSV = exportCSV;
+window.backupData = backupData;
+window.restoreData = restoreData;
+
+startRealtimeListener();

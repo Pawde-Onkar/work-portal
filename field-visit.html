@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>New Field Visit</title>
+
+<link rel="stylesheet" href="field-visit.css">
+
+</head>
+<body>
+
+<header>
+
+    <h1>New Field Visit</h1>
+
+    <a href="field-visit-manager.html" class="nav-btn">
+        Field Visit Manager
+    </a>
+
+</header>
+
+<div class="container">
+
+    <form id="fieldVisitForm">
+
+        <div class="form-group">
+
+            <label>Farmer Name</label>
+
+            <input
+                type="text"
+                id="farmerName"
+                required
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Village</label>
+
+            <input
+                type="text"
+                id="village"
+                required
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Visit Date</label>
+
+            <input
+                type="date"
+                id="visitDate"
+                required
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Visit Type</label>
+
+            <select id="visitType" required>
+
+                <option value="">
+                    Select Type
+                </option>
+
+                <option value="Field Inspection">
+                    Field Inspection
+                </option>
+
+                <option value="Verification">
+                    Verification
+                </option>
+
+                <option value="Follow Up">
+                    Follow Up
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Observation</label>
+
+            <textarea
+                id="observation"
+                rows="4"
+                
+            ></textarea>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Analysis</label>
+
+            <textarea
+                id="analysis"
+                rows="4"
+                
+            ></textarea>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Recommendation</label>
+
+            <textarea
+                id="recommendation"
+                rows="4"
+                
+            ></textarea>
+
+        </div>
+
+        <div class="form-group">
+
+        <label>Upload Photos</label>
+
+        <input
+            type="file"
+            id="visitPhotos"
+            accept="image/*"
+            multiple
+        >
+
+        </div>
+        <div class="form-group">
+
+    <label>Upload Documents</label>
+
+    <input
+        type="file"
+        id="visitDocuments"
+        multiple
+    >
+
+</div>
+        <button type="submit">
+
+            Save Visit
+
+        </button>
+
+    </form>
+
+</div>
+
+<script type="module" src="field-visit.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Field Visit Details</title>
+
+    <link rel="stylesheet"
+          href="field-visit.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>Field Visit Details</h1>
+
+</header>
+
+<div class="container">
+
+    <div id="visitDetails">
+
+    </div>
+
+    <br>
+
+    <a href="field-visit-manager.html"
+       class="nav-btn">
+
+       Back
+
+    </a>
+    <button onclick="generateWordReport()">
+
+    Generate Word Report
+
+    </button>
+    <button onclick="generatePDFReport()">
+    Download PDF
+</button>
+
+</div>
+<script src="https://unpkg.com/docx@8.5.0/dist/index.umd.js"></script>
+<script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="module" src="field-visit-details.js"></script>
+</body>
+
+</html>

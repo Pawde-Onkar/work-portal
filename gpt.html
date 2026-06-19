@@ -434,6 +434,40 @@
 .notification-card strong{
     color:#d35400;
 }
+/* BACKUP BUTTON */
+
+.backup-btn{
+    background:#8e44ad;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    transition:0.3s;
+}
+
+.backup-btn:hover{
+    background:#732d91;
+}
+
+
+/* RESTORE BUTTON */
+
+.restore-btn{
+    background:#d35400;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    transition:0.3s;
+}
+
+.restore-btn:hover{
+    background:#a84300;
+}
     </style>
 
 </head>
@@ -516,6 +550,29 @@
     Download PDF
 
     </button>
+    <button class="backup-btn" onclick="backupData()">
+
+    <i class="fa-solid fa-download"></i>
+    Backup Data
+
+</button>
+
+
+<button class="restore-btn" onclick="document.getElementById('restoreFile').click()">
+
+    <i class="fa-solid fa-upload"></i>
+    Restore Data
+
+</button>
+
+<!-- HIDDEN FILE INPUT -->
+
+<input 
+    type="file"
+    id="restoreFile"
+    accept=".json"
+    style="display:none"
+>
         <!-- FILTER -->
 
         <div class="filter-box">
@@ -662,7 +719,6 @@
 </div>
     <!-- SCRIPT -->
 
-   <script src="script.js"></script>
-
+<script type="module" src="script.js"></script>
 </body>
 </html>
