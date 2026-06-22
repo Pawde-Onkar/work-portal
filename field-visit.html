@@ -7,16 +7,18 @@
 <title>New Field Visit</title>
 
 <link rel="stylesheet" href="field-visit.css">
-
+<link
+href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
+rel="stylesheet">
 </head>
 <body>
 
 <header>
 
-    <h1>New Field Visit</h1>
+    <h1>नवीन क्षेत्र भेट</h1>
 
     <a href="field-visit-manager.html" class="nav-btn">
-        Field Visit Manager
+        मागे
     </a>
 
 </header>
@@ -27,7 +29,9 @@
 
         <div class="form-group">
 
-            <label>Farmer Name</label>
+            <label>
+शेतकऱ्याचे नाव
+</label>
 
             <input
                 type="text"
@@ -39,7 +43,8 @@
 
         <div class="form-group">
 
-            <label>Village</label>
+            <label>गाव
+</label>
 
             <input
                 type="text"
@@ -51,7 +56,7 @@
 
         <div class="form-group">
 
-            <label>Visit Date</label>
+            <label>भेट दिनांक</label>
 
             <input
                 type="date"
@@ -63,7 +68,7 @@
 
         <div class="form-group">
 
-            <label>Visit Type</label>
+            <label>भेटीचा प्रकार</label>
 
             <select id="visitType" required>
 
@@ -127,10 +132,10 @@
 
         <label>Upload Photos</label>
 
-        <input
+       <input
             type="file"
             id="visitPhotos"
-            accept="image/*"
+            accept="image/jpeg,image/jpg,image/png"
             multiple
         >
 
@@ -146,9 +151,13 @@
     >
 
 </div>
+    <div id="uploadLoader" class="loader-container">
+    <div class="loader"></div>
+    <p>Uploading Field Visit...</p>
+</div>
         <button type="submit">
 
-            Save Visit
+            सेव्ह भेट
 
         </button>
 

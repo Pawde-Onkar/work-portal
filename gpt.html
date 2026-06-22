@@ -8,7 +8,9 @@
     <!-- FONT AWESOME -->
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+    <link
+href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
+rel="stylesheet">
     <style>
 
         *{
@@ -17,6 +19,11 @@
             box-sizing:border-box;
             font-family: Arial, Helvetica, sans-serif;
         }
+        body{
+    font-family:
+    'Noto Sans Devanagari',
+    sans-serif;
+}
 
         body{
             background:#f4f7fb;
@@ -468,49 +475,132 @@
 .restore-btn:hover{
     background:#a84300;
 }
+.navbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:white;
+
+    padding:15px 30px;
+
+    box-shadow:
+        0 2px 10px rgba(0,0,0,0.1);
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+}
+
+.logo{
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    color:#ff7b00;
+
+}
+
+.nav-links{
+
+    display:flex;
+
+    gap:15px;
+
+    list-style:none;
+
+    margin:0;
+
+    padding:0;
+
+}
+
+.nav-links a{
+
+    text-decoration:none;
+
+    color:#444;
+
+    padding:10px 18px;
+
+    border-radius:12px;
+
+    transition:0.3s;
+
+    font-weight:500;
+
+}
+
+.nav-links a:hover{
+
+    background:#f5f5f5;
+
+}
+
+.nav-links a.active{
+
+    background:#ff7b00;
+
+    color:white;
+
+}
     </style>
 
 </head>
 <body>
+    <nav class="navbar">
+
+    <div class="logo">
+        तलाठी कार्य पोर्टल
+    </div>
+
+    <ul class="nav-links">
+
+        <li>
+            <a href="gpt.html" id="nav-home">
+                🏠 मुख्यपृष्ठ
+            </a>
+        </li>
+
+        <li>
+            <a href="field-visit-manager.html" id="nav-visit">
+                📋 क्षेत्र भेट
+            </a>
+        </li>
+
+        <li>
+            <a href="notifications.html" id="nav-notification">
+                🔔 सूचना
+            </a>
+        </li>
+
+        <li>
+            <a href="account.html" id="nav-account">
+                👤 माझे खाते
+            </a>
+        </li>
+
+        <li>
+            <a href="#" id="logoutBtn">
+                🚪 बाहेर पडा
+            </a>
+        </li>
+
+    </ul>
+
+</nav>
 
     <!-- HEADER -->
 
-    <header>
 
-        <div class="logo">
-            Talathi Work Portal
-        </div>
-
-        <div class="nav-buttons">
-
-            <a href="index.html">
-                <i class="fa-solid fa-house"></i> Home
-            </a>
-
-            <a href="form.html">
-                <i class="fa-solid fa-plus"></i> Add Farmer
-            </a>
-
-              <a href="field-visit-manager.html">
-                <i class="fa-solid fa-house"></i> Field Visit
-            </a>
-
-
-        </div>
-
-    </header>
-
-    <!-- HERO SECTION -->
-
-    <section class="hero">
-
-        <h1>Farmer Work Progress Management</h1>
-
-        <p>
-            Manage and track farmer work progress efficiently.
-        </p>
-
-    </section>
+   
     <!-- NOTIFICATIONS -->
 
 <section id="notificationSection">
@@ -538,7 +628,7 @@
             <input 
                 type="text" 
                 id="searchInput"
-                placeholder="Search Farmer Name..."
+                placeholder="शेतकऱ्याचे नाव शोधा..."
             >
 
         </div>
@@ -624,29 +714,29 @@
 
                 <tr>
 
-                    <th>Farmer Name</th>
+                    <th>शेतकऱ्याचे नाव</th>
 
-                    <th>Phone</th>
+                    <th>फोन</th>
 
-                    <th>Village</th>
+                    <th>गाव</th>
 
-                    <th>Work Type</th>
+                    <th>कार्य प्रकार</th>
 
-                    <th>Input Date</th>
+                    <th>इनपुट दिनांक</th>
 
-                    <th>Step 1</th>
+                    <th>टप्पा १</th>
 
-                    <th>Step 2</th>
+                    <th>टप्पा २</th>
 
-                    <th>Mutation</th>
+                    <th>म्यूटेशन </th>
 
-                    <th>Step 3</th>
+                    <th>टप्पा ३</th>
 
-                    <th>Approved</th>
+                    <th>मंजूर</th>
 
-                    <th>Status</th>
+                    <th>स्थिती</th>
 
-                    <th>Actions</th>
+                    <th>कृती</th>
 
                 </tr>
 

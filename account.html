@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="mr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>माझे खाते</title>
+
+    <style>
+        body{
+
+    margin:0;
+
+    padding:0;
+
+    background:#f4f6f9;
+
+    font-family:
+        "Noto Sans Devanagari",
+        sans-serif;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    min-height:100vh;
+
+}
+
+.account-card{
+
+    background:white;
+
+    width:500px;
+
+    max-width:90%;
+
+    padding:30px;
+
+    border-radius:20px;
+
+    box-shadow:
+        0 5px 20px
+        rgba(0,0,0,0.12);
+
+}
+
+.account-card h2{
+
+    text-align:center;
+
+    color:#ff7b00;
+
+    margin-bottom:30px;
+
+    font-size:30px;
+
+}
+
+.account-card p{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:12px 0;
+
+    border-bottom:
+        1px solid #eee;
+
+    font-size:18px;
+
+}
+
+.account-card strong{
+
+    color:#444;
+
+}
+
+.account-card span{
+
+    color:#222;
+
+    font-weight:600;
+
+}
+
+#logoutBtn{
+
+    width:100%;
+
+    margin-top:25px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#e53935;
+
+    color:white;
+
+    font-size:17px;
+
+    cursor:pointer;
+
+    transition:0.3s;
+
+}
+
+#logoutBtn:hover{
+
+    background:#c62828;
+
+    transform:
+        translateY(-2px);
+
+}
+
+@media(max-width:600px){
+
+    .account-card{
+
+        padding:20px;
+
+    }
+
+    .account-card h2{
+
+        font-size:24px;
+
+    }
+
+    .account-card p{
+
+        font-size:16px;
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:5px;
+
+    }
+
+}
+    </style>
+</head>
+
+<body>
+
+    <div class="account-card">
+
+        <h2>माझे खाते</h2>
+
+        <p>
+            <strong>नाव:</strong>
+            <span id="userName"></span>
+        </p>
+
+        <p>
+            <strong>ईमेल:</strong>
+            <span id="userEmail"></span>
+        </p>
+
+        <p>
+            <strong>भूमिका:</strong>
+            <span id="userRole"></span>
+        </p>
+
+        <p>
+            <strong>एकूण शेतकरी:</strong>
+            <span id="farmerCount"></span>
+        </p>
+
+        <p>
+            <strong>एकूण क्षेत्र भेटी:</strong>
+            <span id="visitCount"></span>
+        </p>
+
+        <button id="logoutBtn">
+           लॉग आऊट करा 
+        </button>
+        <button id="backBtn">
+            मागे जा
+        </button>
+    </div>
+
+    <script type="module"
+            src="account.js">
+    </script>
+
+</body>
+
+</html>

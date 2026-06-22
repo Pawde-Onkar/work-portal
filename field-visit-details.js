@@ -1,4 +1,4 @@
-import { db }
+import {auth, db }
 from "./firebase.js";
 
 import {
@@ -53,6 +53,16 @@ async function loadVisit() {
     }
 
     visit = docSnap.data();
+    if(
+    visit.userId !==
+    auth.currentUser.uid
+){
+
+    details.innerHTML =
+        "<h2>Access Denied</h2>";
+
+    return;
+}
 
     let photosHtml = "";
 
@@ -324,6 +334,78 @@ async function generatePDFReport() {
     );
 
     y += 15;
+    // ==========================
+    // PHOTOS
+    // ==========================
+    
+  if (
+    visit.photos &&
+    visit.photos.length > 0
+) {
+  
+    
+
+    pdf.setFontSize(16);
+
+    pdf.text(
+        "FIELD VISIT PHOTOS",
+        20,
+        y
+    );
+
+    y += 15;
+
+    for (
+        let i = 0;
+        i < visit.photos.length;
+        i++
+    ) {
+
+
+        try {
+
+            if (y > 220) {
+
+                pdf.addPage();
+
+                y = 20;
+
+            }
+
+            const imageData =
+                visit.photos[i];
+              console.log(imageData.substring(0,50));
+            const imageType =
+                imageData
+                    .split(";")[0]
+                    .split("/")[1]
+                    .toUpperCase();
+
+            pdf.addImage(
+                imageData,
+                imageType,
+                20,
+                y,
+                80,
+                60
+            );
+
+            y += 70;
+
+        }
+        catch(error) {
+
+            console.log(
+                "Photo Error:",
+                error
+            );
+
+        }
+
+    }
+
+}
+  
 
     pdf.text("Observation:", 20, y);
 
@@ -367,70 +449,8 @@ async function generatePDFReport() {
 
     y += recommendation.length * 7 + 15;
 
-    // ==========================
-    // PHOTOS
-    // ==========================
 
-    if (
-        visit.photos &&
-        visit.photos.length > 0
-    ) {
-
-        pdf.addPage();
-
-        y = 20;
-
-        pdf.setFontSize(16);
-
-        pdf.text(
-            "FIELD VISIT PHOTOS",
-            20,
-            y
-        );
-
-        y += 15;
-
-        for (
-            let i = 0;
-            i < visit.photos.length;
-            i++
-        ) {
-
-            try {
-
-                if (y > 220) {
-
-                    pdf.addPage();
-
-                    y = 20;
-
-                }
-
-                pdf.addImage(
-                    visit.photos[i],
-                    "JPEG",
-                    20,
-                    y,
-                    80,
-                    60
-                );
-
-                y += 70;
-
-            } catch (error) {
-
-                console.log(
-                    "Photo Error:",
-                    error
-                );
-
-            }
-
-        }
-
-    }
-
-    // ==========================
+  // ==========================
     // DOCUMENTS
     // ==========================
 

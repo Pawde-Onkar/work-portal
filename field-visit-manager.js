@@ -1,22 +1,46 @@
-import { db }
+import {
+    onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { auth, db }
 from "./firebase.js";
 
 import {
     collection,
     getDocs,
     deleteDoc,
-    doc
+    doc,
+    query,
+    where
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 async function displayVisits(){
+    if(!auth.currentUser){
 
+    return;
+
+}
     const container =
         document.getElementById("visitContainer");
 
-   const snapshot =
-    await getDocs(
-        collection(db, "fieldVisits")
+   const q =
+    query(
+
+        collection(
+            db,
+            "fieldVisits"
+        ),
+
+        where(
+            "userId",
+            "==",
+            auth.currentUser.uid
+        )
+
     );
+
+const snapshot =
+    await getDocs(q);
 
 let visits = [];
 
@@ -128,6 +152,26 @@ document
     displayVisits
 );
 
-displayVisits();
+onAuthStateChanged(
+
+    auth,
+
+    user => {
+
+        if(user){
+
+            displayVisits();
+
+        }
+        else{
+
+            window.location.href =
+                "login.html";
+
+        }
+
+    }
+
+);
 window.deleteVisit =
     deleteVisit;

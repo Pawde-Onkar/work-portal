@@ -6,7 +6,9 @@
     <title>Add Farmer - Talathi Portal</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+    <link
+href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
+rel="stylesheet">
     <style>
 
         *{
@@ -179,7 +181,7 @@
             </a>
 
             <a href="form.html">
-                <i class="fa-solid fa-plus"></i> Add Farmer
+                <i class="fa-solid fa-plus"></i> शेतकरी नोंदणी
             </a>
 
         </div>
@@ -190,7 +192,7 @@
 
     <div class="container">
 
-        <h2>Add Farmer Work Details</h2>
+        <h2>शेतकरी तपशील नोंदणी</h2>
 
         <form id="farmerForm">
 
@@ -199,26 +201,26 @@
             <div>
 
                 <div class="section-title">
-                    Farmer Details
+शेतकऱ्याचा तपशील
                 </div>
 
                 <div class="form-grid">
 
                     <div class="form-group">
-                        <label for="farmerName">Farmer Name</label>
+                        <label for="farmerName"> शेतकऱ्याचे नाव</label>
 
                         <input 
                             type="text" 
                             id="farmerName" 
                             name="farmerName"
                             maxlength="50"
-                            placeholder="Enter Farmer Name"
+                            placeholder="शेतकऱ्याचे नाव टाका"
                             required
                         >
                     </div>
 
                     <div class="form-group">
-                        <label for="phone">Phone Number</label>
+                        <label for="phone">फोन नंबर</label>
 
                         <input 
                             type="tel" 
@@ -226,18 +228,18 @@
                             name="phone"
                             maxlength="10"
                             pattern="[0-9]{10}"
-                            placeholder="Enter Phone Number"
+                            placeholder="फोन नंबर टाका"
                             required
                         >
                     </div>
 
                     <div class="form-group">
-                        <label for="village">Village</label>
+                        <label for="village">गाव</label>
 
                         <select id="village" name="village" required>
 
                             <option value="">
-                                Select Village
+                                गाव निवडा
                             </option>
 
                             <option value="Village 1">
@@ -260,16 +262,16 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="workType">Work Type</label>
+                        <label for="workType">कार्य प्रकार</label>
 
                         <select id="workType" name="workType" >
 
                             <option value="">
-                                Select Work Type
+                                कार्य प्रकार निवडा
                             </option>
 
                             <option value="Mutation">
-                                Mutation
+                                म्यूटेशन
                             </option>
 
                             <option value="7/12 Update">
@@ -277,7 +279,7 @@
                             </option>
 
                             <option value="Land Verification">
-                                Land Verification
+                                लँड वेरिफिकेशन
                             </option>
 
                             <option value="Income Certificate">
@@ -302,7 +304,7 @@
                 <div class="form-grid">
 
                     <div class="form-group">
-                        <label for="inputDate">Input Date</label>
+                        <label for="inputDate">इनपुट दिनांक</label>
 
                         <input 
                             type="date" 
@@ -313,7 +315,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="step1Date">Step 1 Date</label>
+                        <label for="step1Date"> टप्पा १ दिनांक</label>
 
                         <input 
                             type="date" 
@@ -323,7 +325,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="step2Date">Step 2 Date</label>
+                        <label for="step2Date"> टप्पा २ दिनांक</label>
 
                         <input 
                             type="date" 
@@ -333,7 +335,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="mutationDate">Mutation Date</label>
+                        <label for="mutationDate">म्यूटेशन दिनांक</label>
 
                         <input 
                             type="date" 
@@ -343,7 +345,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="step3Date">Step 3 Date</label>
+                        <label for="step3Date"> टप्पा ३ दिनांक</label>
 
                         <input 
                             type="date" 
@@ -354,7 +356,7 @@
 
                     <div class="form-group">
                         <label for="approvedDate">
-                            Approved / Submit Date
+                           मंजूर / सादर केल्याची तारीख
                         </label>
 
                         <input 
@@ -372,22 +374,20 @@
 
             <div>
 
-                <div class="section-title">
-                    Additional Remarks
-                </div>
+               
 
                 <div class="form-grid">
 
                     <div class="form-group full-width">
 
                         <label for="remarks">
-                            Remarks
+                            टिप्पणी
                         </label>
 
                         <textarea 
                             id="remarks"
                             name="remarks"
-                            placeholder="Enter remarks if needed..."
+                            placeholder="आवश्यक असल्यास शेरा नोंदवा..."
                         ></textarea>
 
                     </div>
@@ -401,7 +401,7 @@
             <button type="submit" class="submit-btn">
 
                 <i class="fa-solid fa-floppy-disk"></i>
-                Save Farmer Details
+                 शेतकऱ्याची माहिती सेव्ह करा.
 
             </button>
 

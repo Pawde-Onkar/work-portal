@@ -1,4 +1,20 @@
-import { db }
+import {
+    onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+onAuthStateChanged(auth, user => {
+
+    if (!user) {
+
+        window.location.href =
+            "login.html";
+
+    }
+
+});
+
+import { db, auth }
 from "./firebase.js";
 
 import {
@@ -8,7 +24,9 @@ import {
     getDoc,
     doc,
     updateDoc,
-    deleteDoc
+    deleteDoc,
+       query,
+    where
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 // ==========================================
@@ -37,7 +55,14 @@ console.log("Form Submitted");
 
             id: Date.now(),
 
-            farmerName: document.getElementById("farmerName").value,
+            ownerId:
+                auth.currentUser.uid,
+
+            ownerEmail:
+                auth.currentUser.email,
+
+            farmerName:
+                document.getElementById("farmerName").value,
 
             phone: document.getElementById("phone").value,
 
@@ -155,10 +180,20 @@ async function displayFarmers() {
 
     // GET FARMERS
 
-  const snapshot =
-    await getDocs(
-        collection(db, "farmers")
-    );
+  const q = query(
+
+    collection(db, "farmers"),
+
+    where(
+        "ownerId",
+        "==",
+        auth.currentUser.uid
+    )
+
+);
+
+const snapshot =
+    await getDocs(q);
 
 let farmers = [];
 
@@ -1185,5 +1220,6 @@ window.closeModal = closeModal;
 window.exportCSV = exportCSV;
 window.backupData = backupData;
 window.restoreData = restoreData;
+window.printPDF = printPDF;
 
 startRealtimeListener();

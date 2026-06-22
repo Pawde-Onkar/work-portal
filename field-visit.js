@@ -1,4 +1,4 @@
-import { db }
+import {auth, db }
 from "./firebase.js";
 
 import {
@@ -11,6 +11,7 @@ import {
     deleteDoc
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 
 
 function fileToBase64(file) {
@@ -31,148 +32,225 @@ function fileToBase64(file) {
     });
 
 }
+
+
 const form =
     document.getElementById("fieldVisitForm");
 
+const loader =
+    document.getElementById(
+        "uploadLoader"
+    );
+
+const submitBtn =
+    document.querySelector(
+        "#fieldVisitForm button[type='submit']"
+    );
+
+
 if (form) {
 
-    form.addEventListener("submit", async function (e) {
+    form.addEventListener(
+        "submit",
+        async function (e) {
 
-        e.preventDefault();
+            e.preventDefault();
 
-        // GET PHOTO FILES
+            loader.style.display =
+                "block";
 
-        const photoInput =
-            document.getElementById("visitPhotos");
+            submitBtn.disabled =
+                true;
 
-        const files =
-            photoInput.files;
+            // =====================
+            // GET PHOTO FILES
+            // =====================
 
-        const photos = [];
+            const photoInput =
+                document.getElementById(
+                    "visitPhotos"
+                );
 
-        // CONVERT TO BASE64
+            const files =
+                photoInput.files;
 
-        for (let file of files) {
+            const photos = [];
 
-            const base64 =
-                await fileToBase64(file);
+            for (let file of files) {
 
-            photos.push(base64);
+                const base64 =
+                    await fileToBase64(file);
+
+                photos.push(base64);
+
+            }
+
+            // =====================
+            // GET DOCUMENT FILES
+            // =====================
+
+            const documentInput =
+                document.getElementById(
+                    "visitDocuments"
+                );
+
+            const documentFiles =
+                documentInput.files;
+
+            const documents = [];
+
+            for (
+                let file of documentFiles
+            ) {
+
+                const documentData =
+                    await fileToObject(file);
+
+                documents.push(
+                    documentData
+                );
+
+            }
+
+            // =====================
+            // CREATE VISIT OBJECT
+            // =====================
+
+            const visit = {
+                userId:
+                auth.currentUser.uid,
+                farmerName:
+                    document.getElementById(
+                        "farmerName"
+                    ).value,
+
+                village:
+                    document.getElementById(
+                        "village"
+                    ).value,
+
+                visitDate:
+                    document.getElementById(
+                        "visitDate"
+                    ).value,
+
+                visitType:
+                    document.getElementById(
+                        "visitType"
+                    ).value,
+
+                observation:
+                    document.getElementById(
+                        "observation"
+                    ).value,
+
+                analysis:
+                    document.getElementById(
+                        "analysis"
+                    ).value,
+
+                recommendation:
+                    document.getElementById(
+                        "recommendation"
+                    ).value,
+
+                photos:
+                    photos,
+
+                documents:
+                    documents
+
+            };
+
+            // =====================
+            // SAVE TO FIRESTORE
+            // =====================
+
+            try {
+
+                await addDoc(
+
+                    collection(
+                        db,
+                        "fieldVisits"
+                    ),
+
+                    visit
+
+                );
+
+                loader.style.display =
+                    "none";
+
+                submitBtn.disabled =
+                    false;
+
+                alert(
+                    "Field Visit Saved Successfully!"
+                );
+
+                window.location.href =
+                    "field-visit-manager.html";
+
+            }
+            catch (error) {
+
+                loader.style.display =
+                    "none";
+
+                submitBtn.disabled =
+                    false;
+
+                console.error(
+                    error
+                );
+
+                alert(
+                    error.message
+                );
+
+            }
+
         }
-        
-        const documentInput =
-            document.getElementById(
-                "visitDocuments"
+    );
+
+}
+
+
+function fileToObject(file) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const reader =
+                new FileReader();
+
+            reader.onload =
+                () => {
+
+                    resolve({
+
+                        name:
+                            file.name,
+
+                        type:
+                            file.type,
+
+                        data:
+                            reader.result
+
+                    });
+
+                };
+
+            reader.onerror =
+                reject;
+
+            reader.readAsDataURL(
+                file
             );
 
-        const documentFiles =
-            documentInput.files;
-
-        const documents = [];
-
-        for(let file of documentFiles){
-
-            const documentData =
-                await fileToObject(file);
-
-            documents.push(documentData);
-
         }
-
-        // CREATE VISIT OBJECT
-
-        const visit = {
-
-            
-
-            farmerName:
-                document.getElementById("farmerName").value,
-
-            village:
-                document.getElementById("village").value,
-
-            visitDate:
-                document.getElementById("visitDate").value,
-
-            visitType:
-                document.getElementById("visitType").value,
-
-            observation:
-                document.getElementById("observation").value,
-
-            analysis:
-                document.getElementById("analysis").value,
-
-            recommendation:
-                document.getElementById("recommendation").value,
-
-            photos: photos,
-            documents: documents,
-
-        };
-
-        // GET OLD DATA
-
-      try {
-
-    await addDoc(
-
-        collection(
-            db,
-            "fieldVisits"
-        ),
-
-        visit
-
     );
-
-    alert(
-        "Field Visit Saved Successfully!"
-    );
-
-}
-catch(error){
-
-    console.error(error);
-
-    alert(
-        "Error saving field visit!"
-    );
-
-}
-
-
-        window.location.href =
-            "field-visit-manager.html";
-
-    });
-
-}
-function fileToObject(file){
-
-    return new Promise((resolve,reject)=>{
-
-        const reader =
-            new FileReader();
-
-        reader.onload = () => {
-
-            resolve({
-
-                name: file.name,
-
-                type: file.type,
-
-                data: reader.result
-
-            });
-
-        };
-
-        reader.onerror = reject;
-
-        reader.readAsDataURL(file);
-
-    });
 
 }

@@ -1,0 +1,50 @@
+body{
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    height:100vh;
+
+    background:#f4f4f4;
+
+   
+}
+body{
+    font-family:
+    'Noto Sans Devanagari',
+    sans-serif;
+}
+.login-box{
+
+    background:white;
+
+    padding:30px;
+
+    border-radius:10px;
+
+    box-shadow:
+        0 0 10px rgba(0,0,0,0.2);
+
+    width:350px;
+}
+
+input{
+
+    width:100%;
+
+    padding:10px;
+
+    margin:10px 0;
+}
+
+button{
+
+    width:100%;
+
+    padding:12px;
+
+    margin-top:10px;
+
+    cursor:pointer;
+}
