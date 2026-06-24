@@ -53,6 +53,7 @@ rel="stylesheet">
         }
 
         .nav-buttons a{
+            background:#d35400;
             text-decoration:none;
             color:white;
             background:#2d5b91;
@@ -508,7 +509,7 @@ rel="stylesheet">
 
 }
 
-.nav-links{
+.navbar-links{
 
     display:flex;
 
@@ -522,8 +523,8 @@ rel="stylesheet">
 
 }
 
-.nav-links a{
-
+.navbar-links a{
+    
     text-decoration:none;
 
     color:#444;
@@ -538,13 +539,13 @@ rel="stylesheet">
 
 }
 
-.nav-links a:hover{
+.navbar-links a:hover{
 
     background:#f5f5f5;
 
 }
 
-.nav-links a.active{
+.navbar-links a.active{
 
     background:#ff7b00;
 
@@ -561,34 +562,30 @@ rel="stylesheet">
         तलाठी कार्य पोर्टल
     </div>
 
-    <ul class="nav-links">
+    <ul class="navbar-links">
 
         <li>
-            <a href="gpt.html" id="nav-home">
+            <a href="gpt.html" id="navbar-home">
                 🏠 मुख्यपृष्ठ
             </a>
         </li>
 
         <li>
-            <a href="field-visit-manager.html" id="nav-visit">
+            <a href="field-visit-manager.html" id="navbar-visit">
                 📋 क्षेत्र भेट
             </a>
         </li>
 
-        <li>
-            <a href="notifications.html" id="nav-notification">
-                🔔 सूचना
-            </a>
-        </li>
+       
 
         <li>
-            <a href="account.html" id="nav-account">
+            <a href="account.html" id="navbar-account">
                 👤 माझे खाते
             </a>
         </li>
 
         <li>
-            <a href="#" id="logoutBtn">
+            <a href="#" id="navbar-logout">
                 🚪 बाहेर पडा
             </a>
         </li>
@@ -598,7 +595,11 @@ rel="stylesheet">
 </nav>
 
     <!-- HEADER -->
-
+ <div class="nav-links" style = "display:flex; flex-direction:row-reverse; gap:10px; margin:20px 30px; margin-top:50px">
+     <a href="form.html"  style = "background:#e74c3c; color:white; padding:10px 18px; border-radius:12px; text-decoration:none; ">
+                <i class="fa-solid fa-plus"></i> Add Farmer
+            </a>
+ </div>
 
    
     <!-- NOTIFICATIONS -->

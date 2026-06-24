@@ -6,7 +6,7 @@ const page =
 if(page === "gpt.html"){
 
     document
-    .getElementById("nav-home")
+    .getElementById("navbar-home")
     ?.classList.add("active");
 
 }
@@ -14,23 +14,17 @@ if(page === "gpt.html"){
 if(page === "field-visit-manager.html"){
 
     document
-    .getElementById("nav-visit")
+    .getElementById("navbar-visit")
     ?.classList.add("active");
 
 }
 
-if(page === "notifications.html"){
 
-    document
-    .getElementById("nav-notification")
-    ?.classList.add("active");
-
-}
 
 if(page === "account.html"){
 
     document
-    .getElementById("nav-account")
+    .getElementById("navbar-account")
     ?.classList.add("active");
 
 }
@@ -48,10 +42,31 @@ const logoutBtn =
     document.getElementById(
         "logoutBtn"
     );
+const navbarLogoutBtn =
+    document.getElementById(
+        "navbar-logout"
+    );
 
 if(logoutBtn){
 
     logoutBtn.addEventListener(
+        "click",
+        async () => {
+
+            await signOut(auth);
+
+            localStorage.clear();
+
+            window.location.href =
+                "login.html";
+
+        }
+    );
+
+}
+if(navbarLogoutBtn){
+
+    navbarLogoutBtn.addEventListener(
         "click",
         async () => {
 

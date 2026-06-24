@@ -180,14 +180,122 @@ async function loadVisit() {
 
     `;
 }
+function base64ToUint8Array(base64) {
+
+    const binaryString =
+        atob(
+            base64.split(",")[1]
+        );
+
+    const bytes =
+        new Uint8Array(
+            binaryString.length
+        );
+
+    for (
+        let i = 0;
+        i < binaryString.length;
+        i++
+    ) {
+
+        bytes[i] =
+            binaryString.charCodeAt(i);
+
+    }
+
+    return bytes;
+
+}
 async function generateWordReport() {
 
-    const {
-        Document,
-        Paragraph,
-        HeadingLevel,
-        Packer
-    } = docx;
+   const {
+    Document,
+    Paragraph,
+    HeadingLevel,
+    Packer,
+    ImageRun
+} = window.docx;
+
+   const photoParagraphs = [];
+
+if (
+    visit.photos &&
+    visit.photos.length > 0
+) {
+
+    photoParagraphs.push(
+
+        new Paragraph({
+            text: "Photos",
+            heading:
+                HeadingLevel.HEADING_1
+        })
+
+    );
+
+    visit.photos.forEach(photo => {
+
+        photoParagraphs.push(
+
+            new Paragraph({
+
+                children: [
+
+                    new ImageRun({
+
+                        data:
+                            base64ToUint8Array(photo),
+
+                        transformation: {
+
+                            width: 300,
+
+                            height: 200
+
+                        }
+
+                    })
+
+                ]
+
+            })
+
+        );
+
+    });
+
+}
+
+const documentParagraphs = [];
+
+if (
+    visit.documents &&
+    visit.documents.length > 0
+) {
+
+    documentParagraphs.push(
+
+        new Paragraph({
+            text: "Documents",
+            heading:
+                HeadingLevel.HEADING_1
+        })
+
+    );
+
+    visit.documents.forEach(doc => {
+
+        documentParagraphs.push(
+
+            new Paragraph(
+                doc.name
+            )
+
+        );
+
+    });
+
+}
 
     const doc = new Document({
 
@@ -269,7 +377,9 @@ async function generateWordReport() {
 
                     new Paragraph(
                         visit.recommendation
-                    )
+                    ),
+                   ...photoParagraphs,
+                   ...documentParagraphs
 
                 ]
 

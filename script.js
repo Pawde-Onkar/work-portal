@@ -25,8 +25,9 @@ import {
     doc,
     updateDoc,
     deleteDoc,
-       query,
-    where
+    query,
+    where,
+    onSnapshot
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 // ==========================================
@@ -667,10 +668,16 @@ async function checkNotifications() {
 
     container.innerHTML = "";
 
-    const snapshot =
-        await getDocs(
-            collection(db, "farmers")
-        );
+   const q = query(
+    collection(db, "farmers"),
+    where(
+        "ownerId",
+        "==",
+        auth.currentUser.uid
+    )
+);
+
+const snapshot = await getDocs(q);
 
     let farmers = [];
 
@@ -1211,6 +1218,25 @@ function restoreData(event) {
     reader.readAsText(file);
 
 }
+function startRealtimeListener() {
+
+    const q = query(
+        collection(db, "farmers"),
+        where(
+            "ownerId",
+            "==",
+            auth.currentUser.uid
+        )
+    );
+
+    onSnapshot(q, () => {
+
+        displayFarmers();
+        checkNotifications();
+
+    });
+
+}
 
 
 window.editFarmer = editFarmer;
@@ -1221,5 +1247,17 @@ window.exportCSV = exportCSV;
 window.backupData = backupData;
 window.restoreData = restoreData;
 window.printPDF = printPDF;
+onAuthStateChanged(auth, user => {
 
-startRealtimeListener();
+    if (!user) {
+
+        window.location.href = "login.html";
+        return;
+
+    }
+
+    displayFarmers();
+    checkNotifications();
+    startRealtimeListener();
+
+});

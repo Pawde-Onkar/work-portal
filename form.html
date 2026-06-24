@@ -160,12 +160,124 @@ rel="stylesheet">
                 gap:15px;
             }
         }
+          .navbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:white;
+
+    padding:15px 30px;
+
+    box-shadow:
+        0 2px 10px rgba(0,0,0,0.1);
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+}
+
+.logo{
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    color:#ff7b00;
+
+}
+
+.navbar-links{
+
+    display:flex;
+
+    gap:15px;
+
+    list-style:none;
+
+    margin:0;
+
+    padding:0;
+
+}
+
+.navbar-links a{
+
+    text-decoration:none;
+
+    color:#444;
+
+    padding:10px 18px;
+
+    border-radius:12px;
+
+    transition:0.3s;
+
+    font-weight:500;
+
+}
+
+.navbar-links a:hover{
+
+    background:#f5f5f5;
+
+}
+
+.navbar-links a.active{
+
+    background:#ff7b00;
+
+    color:white;
+
+}
 
     </style>
 
 </head>
 <body>
+<nav class="navbar">
 
+    <div class="logo">
+        तलाठी कार्य पोर्टल
+    </div>
+
+    <ul class="navbar-links">
+
+        <li>
+            <a href="gpt.html" id="navbar-home">
+                🏠 मुख्यपृष्ठ
+            </a>
+        </li>
+
+        <li>
+            <a href="field-visit-manager.html" id="navbar-visit">
+                📋 क्षेत्र भेट
+            </a>
+        </li>
+
+       
+
+        <li>
+            <a href="account.html" id="navbar-account">
+                👤 माझे खाते
+            </a>
+        </li>
+
+        <li>
+            <a href="#" id="navbar-logout">
+                🚪 बाहेर पडा
+            </a>
+        </li>
+
+    </ul>
+
+</nav>
     <!-- HEADER -->
 
     <header>

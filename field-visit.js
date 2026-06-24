@@ -74,6 +74,42 @@ if (form) {
             const files =
                 photoInput.files;
 
+                // Maximum 3 photos
+
+if(files.length > 3){
+
+    alert(
+        "जास्तीत जास्त 3 फोटो अपलोड करता येतील."
+    );
+
+    loader.style.display = "none";
+
+    submitBtn.disabled = false;
+
+    return;
+
+}
+
+// Each photo max 500 KB
+
+for(let file of files){
+
+    if(file.size > 500 * 1024){
+
+        alert(
+            `${file.name} चा आकार 500KB पेक्षा जास्त आहे.`
+        );
+
+        loader.style.display = "none";
+
+        submitBtn.disabled = false;
+
+        return;
+
+    }
+
+}
+
             const photos = [];
 
             for (let file of files) {
@@ -96,7 +132,41 @@ if (form) {
 
             const documentFiles =
                 documentInput.files;
+// Maximum 2 documents
 
+if(documentFiles.length > 2){
+
+    alert(
+        "जास्तीत जास्त 2 दस्तऐवज अपलोड करता येतील."
+    );
+
+    loader.style.display = "none";
+
+    submitBtn.disabled = false;
+
+    return;
+
+}
+
+// Each document max 500 KB
+
+for(let file of documentFiles){
+
+    if(file.size > 500 * 1024){
+
+        alert(
+            `${file.name} चा आकार 500KB पेक्षा जास्त आहे.`
+        );
+
+        loader.style.display = "none";
+
+        submitBtn.disabled = false;
+
+        return;
+
+    }
+
+}
             const documents = [];
 
             for (

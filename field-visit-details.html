@@ -13,6 +13,43 @@ rel="stylesheet">
 </head>
 
 <body>
+    <nav class="navbar">
+
+    <div class="logo">
+        तलाठी कार्य पोर्टल
+    </div>
+
+    <ul class="navbar-links">
+
+        <li>
+            <a href="gpt.html" id="navbar-home">
+                🏠 मुख्यपृष्ठ
+            </a>
+        </li>
+
+        <li>
+            <a href="field-visit-manager.html" id="navbar-visit">
+                📋 क्षेत्र भेट
+            </a>
+        </li>
+
+       
+
+        <li>
+            <a href="account.html" id="navbar-account">
+                👤 माझे खाते
+            </a>
+        </li>
+
+        <li>
+            <a href="#" id="navbar-logout">
+                🚪 बाहेर पडा
+            </a>
+        </li>
+
+    </ul>
+
+</nav>
 
 <header>
 
@@ -44,7 +81,11 @@ rel="stylesheet">
 </button>
 
 </div>
-<script src="https://unpkg.com/docx@8.5.0/dist/index.umd.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script>
+console.log("DOCX =", window.docx);
+</script>
 <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="module" src="field-visit-details.js"></script>
