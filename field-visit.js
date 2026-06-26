@@ -94,10 +94,10 @@ if(files.length > 3){
 
 for(let file of files){
 
-    if(file.size > 500 * 1024){
+    if(file.size > 5000 * 1024){
 
         alert(
-            `${file.name} चा आकार 500KB पेक्षा जास्त आहे.`
+            `${file.name} चा आकार 5MB पेक्षा जास्त आहे.`
         );
 
         loader.style.display = "none";
@@ -112,14 +112,19 @@ for(let file of files){
 
             const photos = [];
 
-            for (let file of files) {
+          for(let file of files){
 
-                const base64 =
-                    await fileToBase64(file);
+    const compressed =
+        await compressImage(file);
 
-                photos.push(base64);
+    const base64 =
+        await fileToBase64(
+            compressed
+        );
 
-            }
+    photos.push(base64);
+
+}
 
             // =====================
             // GET DOCUMENT FILES
@@ -322,5 +327,86 @@ function fileToObject(file) {
 
         }
     );
+
+}
+async function compressImage(file) {
+
+    return new Promise((resolve) => {
+
+        const reader =
+            new FileReader();
+
+        reader.onload = function(e) {
+
+            const img =
+                new Image();
+
+            img.onload = function() {
+
+                const canvas =
+                    document.createElement(
+                        "canvas"
+                    );
+
+                const maxWidth = 1280;
+
+                let width =
+                    img.width;
+
+                let height =
+                    img.height;
+
+                if(width > maxWidth){
+
+                    height =
+                        height *
+                        (maxWidth / width);
+
+                    width =
+                        maxWidth;
+
+                }
+
+                canvas.width =
+                    width;
+
+                canvas.height =
+                    height;
+
+                const ctx =
+                    canvas.getContext("2d");
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                canvas.toBlob(
+
+                    blob => {
+
+                        resolve(blob);
+
+                    },
+
+                    "image/jpeg",
+
+                    0.6
+
+                );
+
+            };
+
+            img.src =
+                e.target.result;
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
 
 }
