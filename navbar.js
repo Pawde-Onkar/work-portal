@@ -11,7 +11,7 @@ if(page === "gpt.html"){
 
 }
 
-if(page === "field-visit-manager.html"){
+if(page === "field-visit-manager.html"|| page === "field-visit.html"){
 
     document
     .getElementById("navbar-visit")

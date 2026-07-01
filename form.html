@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Farmer - Talathi Portal</title>
+    <title>शेतकरी नोंदणी</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link
@@ -15,47 +15,13 @@ rel="stylesheet">
             margin:0;
             padding:0;
             box-sizing:border-box;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: "Noto Sans Devanagari", sans-serif;;
         }
 
         body{
             background:#f4f7fb;
         }
 
-        /* HEADER */
-
-        header{
-            background:#1e3a5f;
-            color:white;
-            padding:20px 40px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            flex-wrap:wrap;
-        }
-
-        .logo{
-            font-size:28px;
-            font-weight:bold;
-        }
-
-        .nav-links{
-            display:flex;
-            gap:15px;
-        }
-
-        .nav-links a{
-            text-decoration:none;
-            color:white;
-            background:#2d5b91;
-            padding:10px 18px;
-            border-radius:8px;
-            transition:0.3s;
-        }
-
-        .nav-links a:hover{
-            background:#3f74b3;
-        }
 
         /* FORM CONTAINER */
 
@@ -95,6 +61,9 @@ rel="stylesheet">
             display:grid;
             grid-template-columns:1fr 1fr;
             gap:20px;
+        }
+        #ferfarFields{
+            display:contents;
         }
 
         .form-group{
@@ -183,7 +152,7 @@ rel="stylesheet">
 
 }
 
-.logo{
+.navbar-logo{
 
     font-size:22px;
 
@@ -243,8 +212,8 @@ rel="stylesheet">
 <body>
 <nav class="navbar">
 
-    <div class="logo">
-        तलाठी कार्य पोर्टल
+    <div class="navbar-logo">
+        ग्राम महसूल अधिकारी निळा
     </div>
 
     <ul class="navbar-links">
@@ -278,27 +247,6 @@ rel="stylesheet">
     </ul>
 
 </nav>
-    <!-- HEADER -->
-
-    <header>
-
-        <div class="logo">
-             Work Portal
-        </div>
-
-        <div class="nav-links">
-
-            <a href="gpt.html">
-                <i class="fa-solid fa-house"></i> Home
-            </a>
-
-            <a href="form.html">
-                <i class="fa-solid fa-plus"></i> शेतकरी नोंदणी
-            </a>
-
-        </div>
-
-    </header>
 
     <!-- FORM CONTAINER -->
 
@@ -350,55 +298,45 @@ rel="stylesheet">
 
                         <select id="village" name="village" required>
 
-                            <option value="">
-                                गाव निवडा
-                            </option>
+                                <option value="">गाव निवडा</option>
+                                
+                            <option value="निळा">निळा</option>
 
-                            <option value="Village 1">
-                                Village 1
-                            </option>
+                            <option value="आलेगांव">आलेगांव</option>
 
-                            <option value="Village 2">
-                                Village 2
-                            </option>
+                            <option value="पिंपरी महिपाल">पिंपरी महिपाल</option>
 
-                            <option value="Village 3">
-                                Village 3
-                            </option>
+                            <option value="इतर">इतर</option>
 
-                            <option value="Village 4">
-                                Village 4
-                            </option>
+                            </select>
+                        </div>
 
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label for="workType">कार्य प्रकार</label>
 
-                    <div class="form-group">
-                        <label for="workType">कार्य प्रकार</label>
 
-                        <select id="workType" name="workType" >
+                            <select id="workType" name="workType" required>
 
-                            <option value="">
-                                कार्य प्रकार निवडा
-                            </option>
+                    <option value="">कामाचा प्रकार निवडा</option>
 
-                            <option value="Mutation">
-                                म्यूटेशन
-                            </option>
+                    <option value="फेरफार">फेरफार</option>
 
-                            <option value="7/12 Update">
-                                7/12 Update
-                            </option>
+                    <option value="दाखला">दाखला</option>
 
-                            <option value="Land Verification">
-                                लँड वेरिफिकेशन
-                            </option>
+                    <option value="शंका निरासना/चौकशी">शंका निरासना/चौकशी</option>
 
-                            <option value="Income Certificate">
-                                Income Certificate
-                            </option>
+                    <option value="अहवाल">अहवाल</option>
 
-                        </select>
+                    <option value="विशेष साहाय्य योजना">विशेष साहाय्य योजना</option>
+
+                    <option value="शिधापत्रिका">शिधापत्रिका</option>
+
+                    <option value="तक्रार">तक्रार</option>
+
+                    <option value="इतर">इतर</option>
+
+                </select>
+                        
                     </div>
 
                 </div>
@@ -410,13 +348,13 @@ rel="stylesheet">
             <div>
 
                 <div class="section-title">
-                    Work Progress Dates
+                    कामाची प्रगती
                 </div>
 
                 <div class="form-grid">
 
                     <div class="form-group">
-                        <label for="inputDate">इनपुट दिनांक</label>
+                        <label for="inputDate">प्राप्त दिनांक</label>
 
                         <input 
                             type="date" 
@@ -425,9 +363,9 @@ rel="stylesheet">
                             required
                         >
                     </div>
-
+            <div id="ferfarFields">
                     <div class="form-group">
-                        <label for="step1Date"> टप्पा १ दिनांक</label>
+                        <label for="step1Date"> फेरफार नोंद दिनांक</label>
 
                         <input 
                             type="date" 
@@ -437,7 +375,7 @@ rel="stylesheet">
                     </div>
 
                     <div class="form-group">
-                        <label for="step2Date"> टप्पा २ दिनांक</label>
+                        <label for="step2Date">नोटीस तामील दिनांक</label>
 
                         <input 
                             type="date" 
@@ -446,18 +384,10 @@ rel="stylesheet">
                         >
                     </div>
 
-                    <div class="form-group">
-                        <label for="mutationDate">म्यूटेशन दिनांक</label>
-
-                        <input 
-                            type="date" 
-                            id="mutationDate"
-                            name="mutationDate"
-                        >
-                    </div>
+                    
 
                     <div class="form-group">
-                        <label for="step3Date"> टप्पा ३ दिनांक</label>
+                        <label for="step3Date"> मंजुरीसाठी सादर केलेला दिनांक</label>
 
                         <input 
                             type="date" 
@@ -465,16 +395,26 @@ rel="stylesheet">
                             name="step3Date"
                         >
                     </div>
-
+            </div>
                     <div class="form-group">
                         <label for="approvedDate">
-                           मंजूर / सादर केल्याची तारीख
+                           मंजूर दिनांक
                         </label>
 
                         <input 
                             type="date" 
                             id="approvedDate"
                             name="approvedDate"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="completionDate">काम पूर्ण दिनांक</label>
+
+                        <input 
+                            type="date" 
+                            id="completionDate"
+                            name="completionDate"
                         >
                     </div>
 
@@ -520,5 +460,9 @@ rel="stylesheet">
         </form>
 
     </div>
-<script type="module" src="script.js"></script></body>
+<script type="module" src="form.js"></script>
+<script type="module" src="navbar.js"></script>
+
+</body>
+
 </html>

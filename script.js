@@ -1,171 +1,234 @@
+// ======================================================
+// FIREBASE IMPORTS
+// ======================================================
+
+import { auth, db } from "./firebase.js";
+
 import {
     onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-onAuthStateChanged(auth, user => {
-
-    if (!user) {
-
-        window.location.href =
-            "login.html";
-
-    }
-
-});
-
-import { db, auth }
-from "./firebase.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
+
     collection,
     addDoc,
     getDocs,
     getDoc,
-    doc,
     updateDoc,
     deleteDoc,
+    doc,
     query,
     where,
     onSnapshot
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+// ======================================================
+// AUTH CHECK
+// ======================================================
+
+
+
+
+// ======================================================
+// FORM
+// ======================================================
+
+const farmerForm =
+    document.getElementById("farmerForm");
+
+
+// ======================================================
+// FORMAT DATE (MARATHI)
+// ======================================================
+
+function formatDate(dateString) {
+
+    if (!dateString)
+        return "-";
+
+    return new Date(dateString)
+        .toLocaleDateString(
+            "mr-IN"
+        );
+
 }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-// ==========================================
-// GET FORM
-// ==========================================
-
-const farmerForm = document.getElementById("farmerForm");
 
 
-// ==========================================
-// SAVE FARMER DATA
-// ==========================================
+// ======================================================
+// CALCULATE TOTAL DAYS
+// ======================================================
+
+function calculateDuration(startDate, endDate) {
+
+    if (!startDate || !endDate)
+        return "-";
+
+    const start =
+        new Date(startDate);
+
+    const end =
+        new Date(endDate);
+
+    const diff =
+        Math.ceil(
+            (end - start) /
+            (1000 * 60 * 60 * 24)
+        );
+
+    return diff + " दिवस";
+
+}
+
+
+// ======================================================
+// STATUS
+// ======================================================
+
+function getStatus(completionDate) {
+
+    if (completionDate)
+        return "मंजूर";
+
+    return "प्रलंबित";
+
+}
+
+
+// ======================================================
+// SAVE FARMER
+// ======================================================
 
 if (farmerForm) {
 
-    farmerForm.addEventListener("submit", async function (e) {
+farmerForm.addEventListener(
+"submit",
+async (e) => {
 
-        e.preventDefault();
-        if (!validateDateOrder()) {
-    return;
-}
-console.log("Form Submitted");
-        // CREATE FARMER OBJECT
+e.preventDefault();
 
-        const farmer = {
+if (!validateDateOrder())
+return;
 
-            id: Date.now(),
+const workType =
+document.getElementById("workType").value;
 
-            ownerId:
-                auth.currentUser.uid,
 
-            ownerEmail:
-                auth.currentUser.email,
+// ====================================
+// FERFAR DATES
+// ====================================
 
-            farmerName:
-                document.getElementById("farmerName").value,
+let step1Date = "";
+let step2Date = "";
+let step3Date = "";
 
-            phone: document.getElementById("phone").value,
+if (workType === "फेरफार") {
 
-            village: document.getElementById("village").value,
+step1Date =
+document.getElementById("step1Date").value;
 
-            workType: document.getElementById("workType").value,
+step2Date =
+document.getElementById("step2Date").value;
 
-            inputDate: document.getElementById("inputDate").value,
-
-            step1Date: document.getElementById("step1Date").value,
-
-            step2Date: document.getElementById("step2Date").value,
-
-            mutationDate: document.getElementById("mutationDate").value,
-
-            step3Date: document.getElementById("step3Date").value,
-
-            approvedDate: document.getElementById("approvedDate").value,
-
-            remarks: document.getElementById("remarks").value,
-
-            status: getStatus()
-
-        };
-
-        // GET OLD DATA
-
-      try {
-
-    await addDoc(
-        collection(db, "farmers"),
-        farmer
-    );
-
-    alert("Farmer Data Saved Successfully!");
-
-    window.location.href = "gpt.html";
-
-}
-catch(error){
-
-    console.error(error);
-
-    alert("Error saving farmer data!");
-
-}
-
-    });
+step3Date =
+document.getElementById("step3Date").value;
 
 }
 
 
-// ==========================================
-// AUTO STATUS LOGIC
-// ==========================================
+// ====================================
+// FARMER OBJECT
+// ====================================
 
-function getStatus() {
+const farmer = {
 
-    const approvedDate =
-        document.getElementById("approvedDate").value;
+ownerId:
+auth.currentUser.uid,
 
-    const step3Date =
-        document.getElementById("step3Date").value;
+ownerEmail:
+auth.currentUser.email,
 
-    const step2Date =
-        document.getElementById("step2Date").value;
+farmerName:
+document.getElementById("farmerName").value.trim(),
 
-    const step1Date =
-        document.getElementById("step1Date").value;
+phone:
+document.getElementById("phone").value.trim(),
 
-    if (approvedDate) {
+village:
+document.getElementById("village").value,
 
-        return "Approved";
+workType:
+workType,
 
-    }
+inputDate:
+document.getElementById("inputDate").value,
 
-    else if (step3Date) {
+step1Date:
+step1Date,
 
-        return "Step 3 Completed";
+step2Date:
+step2Date,
 
-    }
+step3Date:
+step3Date,
 
-    else if (step2Date) {
+approvedDate:
+document.getElementById("approvedDate").value,
 
-        return "Step 2 Completed";
+completionDate:
+document.getElementById("completionDate").value,
 
-    }
+remarks:
+document.getElementById("remarks").value.trim(),
 
-    else if (step1Date) {
+status:
+getStatus(
+document.getElementById("completionDate").value
+)
 
-        return "Step 1 Completed";
+};
 
-    }
 
-    else {
+// ====================================
+// SAVE
+// ====================================
 
-        return "Pending";
+try {
 
-    }
+await addDoc(
+
+collection(
+db,
+"farmers"
+),
+
+farmer
+
+);
+
+alert(
+"शेतकऱ्याची माहिती यशस्वीरित्या सेव्ह झाली."
+);
+
+window.location.href =
+"gpt.html";
+
 }
 
+catch (error) {
 
+console.error(error);
+
+alert(
+"माहिती सेव्ह करताना त्रुटी आली."
+);
+
+}
+
+});
+
+}
 // ==========================================
 // DISPLAY FARMERS
 // ==========================================
@@ -175,190 +238,268 @@ async function displayFarmers() {
     const tableBody =
         document.getElementById("tableBody");
 
-    // STOP IF TABLE DOES NOT EXIST
-
     if (!tableBody) return;
 
-    // GET FARMERS
+    const q = query(
 
-  const q = query(
+        collection(db, "farmers"),
 
-    collection(db, "farmers"),
+        where(
+            "ownerId",
+            "==",
+            auth.currentUser.uid
+        )
 
-    where(
-        "ownerId",
-        "==",
-        auth.currentUser.uid
-    )
+    );
 
-);
+    const snapshot =
+        await getDocs(q);
 
-const snapshot =
-    await getDocs(q);
+    let farmers = [];
 
-let farmers = [];
+    snapshot.forEach(doc => {
 
-snapshot.forEach(doc => {
+        farmers.push({
 
-    farmers.push({
+            firestoreId: doc.id,
 
-        firestoreId: doc.id,
+            ...doc.data()
 
-        ...doc.data()
+        });
 
     });
 
-});
-
-    // SEARCH VALUE
-
-    const searchInput =
-        document.getElementById("searchInput");
+    // -----------------------
+    // SEARCH
+    // -----------------------
 
     const searchValue =
-        searchInput ?
-        searchInput.value.toLowerCase() :
-        "";
+        document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase();
 
+    // -----------------------
     // STATUS FILTER
-
-    const statusFilter =
-        document.getElementById("statusFilter");
+    // -----------------------
 
     const statusValue =
-        statusFilter ?
-        statusFilter.value :
-        "All";
-
-    // FILTER LOGIC
+        document
+        .getElementById("statusFilter")
+        .value;
 
     farmers = farmers.filter(farmer => {
 
-        const matchSearch =
-            farmer.farmerName
-            .toLowerCase()
+        const searchMatch =
+
+            (farmer.farmerName || "")
+.toLowerCase()
             .includes(searchValue);
 
-        const matchStatus =
+        const statusMatch =
+
             statusValue === "All" ||
+
             farmer.status === statusValue;
 
-        return matchSearch && matchStatus;
+        return searchMatch && statusMatch;
 
     });
 
-    // CLEAR TABLE
-
     tableBody.innerHTML = "";
-
-    // NO DATA
 
     if (farmers.length === 0) {
 
         tableBody.innerHTML = `
 
-            <tr>
-                <td colspan="12" style="text-align:center;">
-                    No Farmer Records Found
-                </td>
-            </tr>
+        <tr>
+
+            <td colspan="13"
+                style="text-align:center">
+
+                कोणतीही नोंद उपलब्ध नाही.
+
+            </td>
+
+        </tr>
 
         `;
 
         return;
-    }
 
-    // SHOW DATA
+    }
 
     farmers.forEach(farmer => {
 
-        let statusClass = "pending";
+        //--------------------------------------------------
+        // STATUS COLOR
+        //--------------------------------------------------
 
-        if (farmer.status === "Approved") {
+        let statusClass =
+            farmer.status === "मंजूर"
+            ? "approved"
+            : "pending";
 
-            statusClass = "approved";
+        //--------------------------------------------------
+        // DURATION
+        //--------------------------------------------------
 
-        }
+       let duration = calculateDuration(
+    farmer.inputDate,
+    farmer.completionDate
+);
 
-        else if (
-            farmer.status === "Step 1 Completed" ||
-            farmer.status === "Step 2 Completed" ||
-            farmer.status === "Step 3 Completed"
-        ) {
 
-            statusClass = "progress";
+        //--------------------------------------------------
+        // FERFAR CHECK
+        //--------------------------------------------------
 
-        }
+        const isFerfar =
+            farmer.workType === "फेरफार";
+
+        const step1 =
+            isFerfar
+            ? formatDate(farmer.step1Date)
+            : "-";
+
+        const step2 =
+            isFerfar
+            ? formatDate(farmer.step2Date)
+            : "-";
+
+        const step3 =
+            isFerfar
+            ? formatDate(farmer.step3Date)
+            : "-";
+
+        //--------------------------------------------------
+        // TABLE
+        //--------------------------------------------------
 
         tableBody.innerHTML += `
 
-            <tr>
+        <tr>
 
-                <td>${farmer.farmerName}</td>
+            <td>${farmer.farmerName}</td>
 
-                <td>${farmer.phone}</td>
+            <td>${farmer.phone}</td>
 
-                <td>${farmer.village}</td>
+            <td>${farmer.village}</td>
 
-                <td>${farmer.workType}</td>
+            <td>${farmer.workType}</td>
 
-                <td>${farmer.inputDate || "-"}</td>
+            <td>${formatDate(farmer.inputDate)}</td>
 
-                <td>${farmer.step1Date || "-"}</td>
+            <td>${step1}</td>
 
-                <td>${farmer.step2Date || "-"}</td>
+            <td>${step2}</td>
 
-                <td>${farmer.mutationDate || "-"}</td>
+            <td>${step3}</td>
 
-                <td>${farmer.step3Date || "-"}</td>
+            <td>${formatDate(farmer.approvedDate)}</td>
 
-                <td>${farmer.approvedDate || "-"}</td>
+            <td>${formatDate(farmer.completionDate)}</td>
 
-                <td>
-                    <span class="status ${statusClass}">
-                        ${farmer.status}
-                    </span>
-                </td>
+            <td>${duration}</td>
 
-                <td>
+            <td>
 
-                    <button 
-                        class="action-btn edit-btn"
-                       onclick="editFarmer('${farmer.firestoreId}')"
-                    >
-                        Edit
-                    </button>
+                <span class="status ${statusClass}">
 
-                    <button 
-                        class="action-btn delete-btn"
-                        onclick="deleteFarmer('${farmer.firestoreId}')"
-                    >
-                        Delete
-                    </button>
+                    ${farmer.status}
 
-                </td>
+                </span>
 
-            </tr>
+            </td>
+
+            <td>
+
+                <button
+
+                    class="action-btn edit-btn"
+
+                    onclick="editFarmer('${farmer.firestoreId}')"
+
+                >
+
+                    Edit
+
+                </button>
+
+                <button
+
+                    class="action-btn delete-btn"
+
+                    onclick="deleteFarmer('${farmer.firestoreId}')"
+
+                >
+
+                    Delete
+
+                </button>
+
+            </td>
+
+        </tr>
 
         `;
+
     });
 
 }
 
-
+//
 // ==========================================
-// GLOBAL EDIT ID
+// SEARCH
+// ==========================================
+//
+
+const searchInput =
+    document.getElementById("searchInput");
+
+if (searchInput) {
+
+    searchInput.addEventListener(
+
+        "input",
+
+        displayFarmers
+
+    );
+
+}
+
+//
+// ==========================================
+// STATUS FILTER
+// ==========================================
+//
+
+const statusFilter =
+    document.getElementById("statusFilter");
+
+if (statusFilter) {
+
+    statusFilter.addEventListener(
+
+        "change",
+
+        displayFarmers
+
+    );
+
+}
+// ==========================================
+// GLOBAL VARIABLES
 // ==========================================
 
-
-
-
-// ==========================================
-// OPEN EDIT MODAL
-// ==========================================
-
-let currentFarmer = null;
 let currentEditId = null;
+let currentFarmer = null;
+
+
+// ==========================================
+// EDIT FARMER
+// ==========================================
 
 async function editFarmer(id) {
 
@@ -370,11 +511,12 @@ async function editFarmer(id) {
 
     if (!docSnap.exists()) {
 
-        alert("Farmer not found!");
-
+        alert("Record not found.");
         return;
 
     }
+
+    currentEditId = id;
 
     currentFarmer = {
 
@@ -384,7 +526,9 @@ async function editFarmer(id) {
 
     };
 
-    currentEditId = id;
+    //-------------------------------------------------
+    // Fill Dates
+    //-------------------------------------------------
 
     document.getElementById("editStep1").value =
         currentFarmer.step1Date || "";
@@ -392,14 +536,74 @@ async function editFarmer(id) {
     document.getElementById("editStep2").value =
         currentFarmer.step2Date || "";
 
-    document.getElementById("editMutation").value =
-        currentFarmer.mutationDate || "";
-
     document.getElementById("editStep3").value =
         currentFarmer.step3Date || "";
 
     document.getElementById("editApproved").value =
         currentFarmer.approvedDate || "";
+
+    const completionInput =
+        document.getElementById("editCompletionDate");
+
+    if (completionInput) {
+
+        completionInput.value =
+            currentFarmer.completionDate || "";
+
+    }
+
+
+    //-------------------------------------------------
+    // Set Min Dates
+    editStep2.min =
+currentFarmer.step1Date || "";
+
+editStep3.min =
+currentFarmer.step2Date || "";
+
+editApproved.min =
+currentFarmer.step3Date || "";
+
+if(editCompletion){
+
+editCompletion.min =
+currentFarmer.approvedDate || "";
+
+}
+
+    //-------------------------------------------------
+    // Show / Hide Ferfar Steps
+    //-------------------------------------------------
+
+    const isFerfar =
+        currentFarmer.workType === "फेरफार";
+
+    const step1Group =
+        document.getElementById("editStep1")
+        .closest(".modal-group");
+
+    const step2Group =
+        document.getElementById("editStep2")
+        .closest(".modal-group");
+
+    const step3Group =
+        document.getElementById("editStep3")
+        .closest(".modal-group");
+
+    if (isFerfar) {
+
+        step1Group.style.display = "";
+        step2Group.style.display = "";
+        step3Group.style.display = "";
+
+    }
+    else {
+
+        step1Group.style.display = "none";
+        step2Group.style.display = "none";
+        step3Group.style.display = "none";
+
+    }
 
     document.getElementById("editModal").style.display =
         "block";
@@ -413,7 +617,8 @@ async function editFarmer(id) {
 
 function closeModal() {
 
-    document.getElementById("editModal").style.display = "none";
+    document.getElementById("editModal").style.display =
+        "none";
 
 }
 
@@ -421,10 +626,13 @@ function closeModal() {
 // ==========================================
 // SAVE EDIT
 // ==========================================
+
 async function saveEdit() {
 
     if (!validateEditDates()) {
+
         return;
+
     }
 
     const updatedData = {
@@ -435,58 +643,57 @@ async function saveEdit() {
         step2Date:
             document.getElementById("editStep2").value,
 
-        mutationDate:
-            document.getElementById("editMutation").value,
-
         step3Date:
             document.getElementById("editStep3").value,
 
         approvedDate:
-            document.getElementById("editApproved").value
+            document.getElementById("editApproved").value,
+
+        completionDate:
+            document.getElementById("editCompletionDate")
+            ? document.getElementById("editCompletionDate").value
+            : ""
 
     };
 
-    if (updatedData.approvedDate) {
+    //-------------------------------------------------
+    // Non-Ferfar
+    //-------------------------------------------------
 
-        updatedData.status = "Approved";
+    if (currentFarmer.workType !== "फेरफार") {
 
-    }
-
-    else if (updatedData.step3Date) {
-
-        updatedData.status = "Step 3 Completed";
-
-    }
-
-    else if (updatedData.step2Date) {
-
-        updatedData.status = "Step 2 Completed";
+        updatedData.step1Date = "";
+        updatedData.step2Date = "";
+        updatedData.step3Date = "";
 
     }
 
-    else if (updatedData.step1Date) {
+    //-------------------------------------------------
+    // Status
+    //-------------------------------------------------
 
-        updatedData.status = "Step 1 Completed";
+    updatedData.status =
+        calculateStatus(updatedData);
 
-    }
+    //-------------------------------------------------
 
-    else {
-
-        updatedData.status = "Pending";
-
-    }
+    try {
 
     await updateDoc(
-
         doc(db, "farmers", currentEditId),
-
         updatedData
-
     );
+
+    alert("माहिती अपडेट झाली.");
 
     closeModal();
 
-    displayFarmers();
+} catch (e) {
+
+    alert("Update failed.");
+
+}
+
 }
 
 
@@ -497,420 +704,34 @@ async function saveEdit() {
 async function deleteFarmer(id) {
 
     const confirmDelete =
-        confirm("Delete this farmer record?");
 
-    if (!confirmDelete) return;
+        confirm(
 
-    await deleteDoc(
-        doc(db, "farmers", id)
-    );
+            "ही नोंद हटवायची आहे का?"
 
-    displayFarmers();
-}
-
-
-// ==========================================
-// SEARCH EVENT
-// ==========================================
-
-const searchInput =
-    document.getElementById("searchInput");
-
-if (searchInput) {
-
-    searchInput.addEventListener(
-        "input",
-        displayFarmers
-    );
-
-}
-
-
-// ==========================================
-// FILTER EVENT
-// ==========================================
-
-const statusFilter =
-    document.getElementById("statusFilter");
-
-if (statusFilter) {
-
-    statusFilter.addEventListener(
-        "change",
-        displayFarmers
-    );
-
-}
-
-
-// ==========================================
-// INITIAL LOAD
-// ==========================================
-
-
-// ==========================================
-// EXPORT CSV / EXCEL
-// ==========================================
-
-async function exportCSV() {
-
-    const snapshot =
-        await getDocs(
-            collection(db, "farmers")
         );
 
-    let farmers = [];
-
-    snapshot.forEach(doc => {
-
-        farmers.push({
-
-            firestoreId: doc.id,
-
-            ...doc.data()
-
-        });
-
-    });
-
-    // NO DATA
-
-    if (farmers.length === 0) {
-
-        alert("No farmer data available!");
+    if (!confirmDelete) {
 
         return;
+
     }
 
-    // CSV HEADERS
+try{
 
-    let csv =
-        "Farmer Name,Phone,Village,Work Type,Input Date,Step1 Date,Step2 Date,Mutation Date,Step3 Date,Approved Date,Status,Remarks\n";
+await deleteDoc( doc(db, "farmers", id));
 
-    // ADD FARMER DATA
-
-    farmers.forEach(farmer => {
-
-        csv +=
-            `"${farmer.farmerName || ""}",` +
-            `"${farmer.phone || ""}",` +
-            `"${farmer.village || ""}",` +
-            `"${farmer.workType || ""}",` +
-            `"${farmer.inputDate || ""}",` +
-            `"${farmer.step1Date || ""}",` +
-            `"${farmer.step2Date || ""}",` +
-            `"${farmer.mutationDate || ""}",` +
-            `"${farmer.step3Date || ""}",` +
-            `"${farmer.approvedDate || ""}",` +
-            `"${farmer.status || ""}",` +
-            `"${farmer.remarks || ""}"\n`;
-
-    });
-
-    // CREATE FILE
-
-    const blob =
-        new Blob(
-            [csv],
-            { type: "text/csv" }
-        );
-
-    const url =
-        window.URL.createObjectURL(blob);
-
-    const a =
-        document.createElement("a");
-
-    a.href = url;
-
-    a.download =
-        "Farmer_Records.csv";
-
-    a.click();
-
-    window.URL.revokeObjectURL(url);
+alert("Deleted");
 
 }
-// ==========================================
-// PRINT / PDF DOWNLOAD
-// ==========================================
 
-function printPDF() {
+catch(e){
 
-    window.print();
+alert("Delete failed");
 
 }
-// ==========================================
-// NOTIFICATION SYSTEM
-// ==========================================
+    displayFarmers();
 
-const delays = {
-
-    step1: 0,
-    step2: 0,
-    mutation: 0,
-    step3: 0
-
-};
-
-
-// ==========================================
-// CHECK NOTIFICATIONS
-// ==========================================
-async function checkNotifications() {
-
-    const container =
-        document.getElementById(
-            "notificationContainer"
-        );
-
-    if (!container) return;
-
-    container.innerHTML = "";
-
-   const q = query(
-    collection(db, "farmers"),
-    where(
-        "ownerId",
-        "==",
-        auth.currentUser.uid
-    )
-);
-
-const snapshot = await getDocs(q);
-
-    let farmers = [];
-
-    snapshot.forEach(doc => {
-
-        farmers.push({
-
-            firestoreId: doc.id,
-
-            ...doc.data()
-
-        });
-
-    });
-
-    const today =
-        new Date();
-
-    farmers.forEach(farmer => {
-
-        // STEP 1 → STEP 2
-
-        if (
-            farmer.step1Date &&
-            !farmer.step2Date
-        ) {
-
-            const step1 =
-                new Date(
-                    farmer.step1Date
-                );
-
-            const diffDays =
-                (today - step1) /
-                (1000 * 60 * 60 * 24);
-
-            if (
-                diffDays >= delays.step1
-            ) {
-
-                container.innerHTML += `
-
-                    <div class="notification-card">
-
-                        <strong>
-                            ${farmer.farmerName}
-                        </strong>
-
-                        is ready for Step 2 Process.
-
-                    </div>
-
-                `;
-            }
-        }
-
-        // STEP 2 → MUTATION
-
-        if (
-            farmer.step2Date &&
-            !farmer.mutationDate
-        ) {
-
-            const step2 =
-                new Date(
-                    farmer.step2Date
-                );
-
-            const diffDays =
-                (today - step2) /
-                (1000 * 60 * 60 * 24);
-
-            if (
-                diffDays >= delays.step2
-            ) {
-
-                container.innerHTML += `
-
-                    <div class="notification-card">
-
-                        <strong>
-                            ${farmer.farmerName}
-                        </strong>
-
-                        is ready for Mutation Process.
-
-                    </div>
-
-                `;
-            }
-        }
-
-        // MUTATION → STEP 3
-
-        if (
-            farmer.mutationDate &&
-            !farmer.step3Date
-        ) {
-
-            const mutation =
-                new Date(
-                    farmer.mutationDate
-                );
-
-            const diffDays =
-                (today - mutation) /
-                (1000 * 60 * 60 * 24);
-
-            if (
-                diffDays >= delays.mutation
-            ) {
-
-                container.innerHTML += `
-
-                    <div class="notification-card">
-
-                        <strong>
-                            ${farmer.farmerName}
-                        </strong>
-
-                        is ready for Step 3 Process.
-
-                    </div>
-
-                `;
-            }
-        }
-        // STEP 3 → APPROVAL
-
-if (
-    farmer.step3Date &&
-    !farmer.approvedDate
-) {
-
-    const step3 =
-        new Date(
-            farmer.step3Date
-        );
-
-    const diffDays =
-        (today - step3) /
-        (1000 * 60 * 60 * 24);
-
-    if (
-        diffDays >= delays.step3
-    ) {
-
-        container.innerHTML += `
-
-            <div class="notification-card">
-
-                <strong>
-                    ${farmer.farmerName}
-                </strong>
-
-                is ready for Approval Process.
-
-            </div>
-
-        `;
-    }
-}
-
-    });
-
-}
-// ==========================================
-// ==========================================
-// DATE ORDER VALIDATION
-// ==========================================
-
-function validateDateOrder() {
-
-    const inputDate =
-        document.getElementById("inputDate").value;
-
-    const step1Date =
-        document.getElementById("step1Date").value;
-
-    const step2Date =
-        document.getElementById("step2Date").value;
-
-    const mutationDate =
-        document.getElementById("mutationDate").value;
-
-    const step3Date =
-        document.getElementById("step3Date").value;
-
-    const approvedDate =
-        document.getElementById("approvedDate").value;
-
-
-    if (
-        step1Date &&
-        new Date(step1Date) < new Date(inputDate)
-    ) {
-        alert("Step 1 Date cannot be before Input Date.");
-        return false;
-    }
-
-    if (
-        step2Date &&
-        new Date(step2Date) < new Date(step1Date)
-    ) {
-        alert("Step 2 Date cannot be before Step 1 Date.");
-        return false;
-    }
-
-    if (
-        mutationDate &&
-        new Date(mutationDate) < new Date(step2Date)
-    ) {
-        alert("Mutation Date cannot be before Step 2 Date.");
-        return false;
-    }
-
-    if (
-        step3Date &&
-        new Date(step3Date) < new Date(mutationDate)
-    ) {
-        alert("Step 3 Date cannot be before Mutation Date.");
-        return false;
-    }
-
-    if (
-        approvedDate &&
-        new Date(approvedDate) < new Date(step3Date)
-    ) {
-        alert("Approved Date cannot be before Step 3 Date.");
-        return false;
-    }
-
-    return true;
 }
 // ==========================================
 // EDIT DATE VALIDATION
@@ -924,55 +745,84 @@ function validateEditDates() {
     const step2 =
         document.getElementById("editStep2").value;
 
-    const mutation =
-        document.getElementById("editMutation").value;
-
     const step3 =
         document.getElementById("editStep3").value;
 
     const approved =
         document.getElementById("editApproved").value;
 
-    if (
-        step1 &&
-        step2 &&
-        new Date(step2) < new Date(step1)
-    ) {
-        alert("Step 2 Date cannot be before Step 1 Date.");
-        return false;
+    const completion =
+        document.getElementById("editCompletionDate")
+            ? document.getElementById("editCompletionDate").value
+            : "";
+
+    //--------------------------------------------------
+    // Only Ferfar requires step validation
+    //--------------------------------------------------
+
+    if (currentFarmer.workType === "फेरफार") {
+
+        if (
+            step1 &&
+            step2 &&
+            new Date(step2) < new Date(step1)
+        ) {
+
+            alert("नोटीस तामील दिनांक फेरफार नोंद दिनांकापेक्षा कमी असू शकत नाही.");
+
+            return false;
+
+        }
+
+        if (
+            step2 &&
+            step3 &&
+            new Date(step3) < new Date(step2)
+        ) {
+
+            alert("मंजुरीसाठी सादर दिनांक नोटीस तामील दिनांकापेक्षा कमी असू शकत नाही.");
+
+            return false;
+
+        }
+
+        if (
+            step3 &&
+            approved &&
+            new Date(approved) < new Date(step3)
+        ) {
+
+            alert("मंजूर दिनांक मंजुरीसाठी सादर दिनांकापेक्षा कमी असू शकत नाही.");
+
+            return false;
+
+        }
+
     }
 
-    if (
-        step2 &&
-        mutation &&
-        new Date(mutation) < new Date(step2)
-    ) {
-        alert("Mutation Date cannot be before Step 2 Date.");
-        return false;
-    }
+    //--------------------------------------------------
+    // Completion Date
+    //--------------------------------------------------
 
     if (
-        mutation &&
-        step3 &&
-        new Date(step3) < new Date(mutation)
-    ) {
-        alert("Step 3 Date cannot be before Mutation Date.");
-        return false;
-    }
-
-    if (
-        step3 &&
         approved &&
-        new Date(approved) < new Date(step3)
+        completion &&
+        new Date(completion) < new Date(approved)
     ) {
-        alert("Approved Date cannot be before Step 3 Date.");
+
+        alert("काम पूर्ण दिनांक मंजूर दिनांकापेक्षा कमी असू शकत नाही.");
+
         return false;
+
     }
 
     return true;
+
 }
+
+
 // ==========================================
-// EDIT MODAL DATE CHAIN
+// EDIT MODAL DATE RESTRICTIONS
 // ==========================================
 
 const editStep1 =
@@ -981,257 +831,170 @@ const editStep1 =
 const editStep2 =
     document.getElementById("editStep2");
 
-const editMutation =
-    document.getElementById("editMutation");
-
 const editStep3 =
     document.getElementById("editStep3");
 
 const editApproved =
     document.getElementById("editApproved");
 
+const editCompletion =
+    document.getElementById("editCompletionDate");
+
 if (editStep1) {
 
     editStep1.addEventListener("change", () => {
 
-        editStep2.min = editStep1.value;
+        editStep2.min =
+            editStep1.value;
 
     });
+
+}
+
+if (editStep2) {
 
     editStep2.addEventListener("change", () => {
 
-        editMutation.min = editStep2.value;
+        editStep3.min =
+            editStep2.value;
 
     });
 
-    editMutation.addEventListener("change", () => {
+}
 
-        editStep3.min = editMutation.value;
-
-    });
+if (editStep3) {
 
     editStep3.addEventListener("change", () => {
 
-        editApproved.min = editStep3.value;
+        editApproved.min =
+            editStep3.value;
 
     });
 
 }
-// ==========================================
-// ADD FARMER DATE CHAIN
-// ==========================================
 
-const inputDate = document.getElementById("inputDate");
-const step1Date = document.getElementById("step1Date");
-const step2Date = document.getElementById("step2Date");
-const mutationDate = document.getElementById("mutationDate");
-const step3Date = document.getElementById("step3Date");
-const approvedDate = document.getElementById("approvedDate");
+if (editApproved && editCompletion) {
 
-if (inputDate) {
+    editApproved.addEventListener("change", () => {
 
-    inputDate.addEventListener("change", () => {
-        step1Date.min = inputDate.value;
-    });
-
-    step1Date.addEventListener("change", () => {
-        step2Date.min = step1Date.value;
-    });
-
-    step2Date.addEventListener("change", () => {
-        mutationDate.min = step2Date.value;
-    });
-
-    mutationDate.addEventListener("change", () => {
-        step3Date.min = mutationDate.value;
-    });
-
-    step3Date.addEventListener("change", () => {
-        approvedDate.min = step3Date.value;
-    });
-
-}
-// ==========================================
-// BACKUP DATA
-// ==========================================
-
-async function backupData() {
-
-    const snapshot =
-        await getDocs(
-            collection(db, "farmers")
-        );
-
-    let farmers = [];
-
-    snapshot.forEach(doc => {
-
-        farmers.push({
-
-            ...doc.data()
-
-        });
+        editCompletion.min =
+            editApproved.value;
 
     });
-
-    if (farmers.length === 0) {
-
-        alert("No data available for backup!");
-
-        return;
-
-    }
-
-    const jsonData =
-        JSON.stringify(
-            farmers,
-            null,
-            2
-        );
-
-    const blob =
-        new Blob(
-            [jsonData],
-            {
-                type:
-                    "application/json"
-            }
-        );
-
-    const url =
-        URL.createObjectURL(blob);
-
-    const a =
-        document.createElement("a");
-
-    a.href = url;
-
-    const today =
-        new Date()
-            .toISOString()
-            .split("T")[0];
-
-    a.download =
-        `farmers_backup_${today}.json`;
-
-    a.click();
-
-    URL.revokeObjectURL(url);
-
-}// ==========================================
-// RESTORE DATA
-// ==========================================
-
-const restoreFile =
-    document.getElementById("restoreFile");
-
-if (restoreFile) {
-
-    restoreFile.addEventListener("change", restoreData);
 
 }
 
 
-function restoreData(event) {
+// ==========================================
+// NOTIFICATIONS
+// ==========================================
 
-    const file =
-        event.target.files[0];
+async function checkNotifications() {
 
-    // NO FILE
-
-    if (!file) return;
-
-    const reader =
-        new FileReader();
-
-    reader.onload = async function(e) {
-
-    try {
-
-        const farmers =
-            JSON.parse(
-                e.target.result
-            );
-
-        if (
-            !Array.isArray(
-                farmers
-            )
-        ) {
-
-            alert(
-                "Invalid backup file!"
-            );
-
-            return;
-
-        }
-
-        const confirmRestore =
-            confirm(
-                "Restore backup data?"
-            );
-
-        if (!confirmRestore)
-            return;
-
-        for (
-            const farmer
-            of farmers
-        ) {
-
-            await addDoc(
-
-                collection(
-                    db,
-                    "farmers"
-                ),
-
-                farmer
-
-            );
-
-        }
-
-        alert(
-            "Backup Restored Successfully!"
+    const container =
+        document.getElementById(
+            "notificationContainer"
         );
 
-        location.reload();
+    if (!container) return;
 
-    }
-
-    catch(error) {
-
-        console.error(
-            error
-        );
-
-        alert(
-            "Invalid backup file!"
-        );
-
-    }
-
-};
-
-    reader.readAsText(file);
-
-}
-function startRealtimeListener() {
+    container.innerHTML = "";
 
     const q = query(
+
         collection(db, "farmers"),
+
         where(
             "ownerId",
             "==",
             auth.currentUser.uid
         )
+
+    );
+
+    const snapshot =
+        await getDocs(q);
+
+    snapshot.forEach(docSnap => {
+
+        const farmer =
+            docSnap.data();
+
+        //--------------------------------------------------
+        // Pending Approval
+        //--------------------------------------------------
+
+        if (
+            !farmer.approvedDate
+        ) {
+
+            container.innerHTML += `
+
+                <div class="notification-card">
+
+                    <strong>
+                        ${farmer.farmerName}
+                    </strong>
+
+                    यांचे काम मंजुरीसाठी प्रलंबित आहे.
+
+                </div>
+
+            `;
+
+        }
+
+        //--------------------------------------------------
+        // Approved but not Completed
+        //--------------------------------------------------
+
+        else if (
+            !farmer.completionDate
+        ) {
+
+            container.innerHTML += `
+
+                <div class="notification-card">
+
+                    <strong>
+                        ${farmer.farmerName}
+                    </strong>
+
+                    यांचे काम पूर्ण करणे बाकी आहे.
+
+                </div>
+
+            `;
+
+        }
+
+    });
+
+}
+
+
+// ==========================================
+// REALTIME LISTENER
+// ==========================================
+
+function startRealtimeListener() {
+
+    const q = query(
+
+        collection(db, "farmers"),
+
+        where(
+            "ownerId",
+            "==",
+            auth.currentUser.uid
+        )
+
     );
 
     onSnapshot(q, () => {
 
         displayFarmers();
+
         checkNotifications();
 
     });
@@ -1239,25 +1002,138 @@ function startRealtimeListener() {
 }
 
 
-window.editFarmer = editFarmer;
-window.deleteFarmer = deleteFarmer;
-window.saveEdit = saveEdit;
-window.closeModal = closeModal;
-window.exportCSV = exportCSV;
-window.backupData = backupData;
-window.restoreData = restoreData;
-window.printPDF = printPDF;
-onAuthStateChanged(auth, user => {
+// ==========================================
+// SEARCH EVENT
+// ==========================================
 
-    if (!user) {
 
-        window.location.href = "login.html";
-        return;
+
+if (searchInput) {
+
+    searchInput.addEventListener(
+
+        "input",
+
+        displayFarmers
+
+    );
+
+}
+
+
+// ==========================================
+// FILTER EVENT
+// ==========================================
+
+
+
+if (statusFilter) {
+
+    statusFilter.addEventListener(
+
+        "change",
+
+        displayFarmers
+
+    );
+
+}
+
+
+
+
+// ==========================================
+// INITIAL LOAD
+// ==========================================
+
+onAuthStateChanged(
+
+    auth,
+
+    user => {
+
+        if (!user) {
+
+            window.location.href =
+                "login.html";
+
+            return;
+
+        }
+
+        displayFarmers();
+
+        checkNotifications();
+
+        startRealtimeListener();
 
     }
 
-    displayFarmers();
-    checkNotifications();
-    startRealtimeListener();
+);
 
-});
+function calculateStatus(data){
+
+    return data.completionDate
+        ? "मंजूर"
+        : "प्रलंबित";
+
+}
+function validateDateOrder() {
+
+    const workType =
+        document.getElementById("workType").value;
+
+    const step1 =
+        document.getElementById("step1Date")?.value;
+
+    const step2 =
+        document.getElementById("step2Date")?.value;
+
+    const step3 =
+        document.getElementById("step3Date")?.value;
+
+    const approved =
+        document.getElementById("approvedDate").value;
+
+    const completion =
+        document.getElementById("completionDate").value;
+
+    if (workType === "फेरफार") {
+
+        if (step1 && step2 && step2 < step1) {
+            alert("Step 2 cannot be before Step 1.");
+            return false;
+        }
+
+        if (step2 && step3 && step3 < step2) {
+            alert("Step 3 cannot be before Step 2.");
+            return false;
+        }
+
+        if (step3 && approved && approved < step3) {
+            alert("Approved Date cannot be before Step 3.");
+            return false;
+        }
+
+    }
+
+    if (approved && completion && completion < approved) {
+
+        alert("Completion Date cannot be before Approved Date.");
+
+        return false;
+
+    }
+
+    return true;
+}
+
+
+// ==========================================
+// EXPORT FUNCTIONS
+// ==========================================
+
+window.editFarmer = editFarmer;
+window.closeModal = closeModal;
+window.saveEdit = saveEdit;
+window.deleteFarmer = deleteFarmer;

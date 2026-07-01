@@ -42,49 +42,9 @@ rel="stylesheet">
             flex-wrap:wrap;
         }
 
-        .logo{
-            font-size:28px;
-            font-weight:bold;
-        }
+       
 
-        .nav-buttons{
-            display:flex;
-            gap:15px;
-        }
 
-        .nav-buttons a{
-            background:#d35400;
-            text-decoration:none;
-            color:white;
-            background:#2d5b91;
-            padding:10px 18px;
-            border-radius:8px;
-            transition:0.3s;
-        }
-
-        .nav-buttons a:hover{
-            background:#3f74b3;
-        }
-
-        /* HERO SECTION */
-
-        .hero{
-            padding:40px;
-            text-align:center;
-            background:white;
-            box-shadow:0 2px 10px rgba(0,0,0,0.08);
-        }
-
-        .hero h1{
-            font-size:40px;
-            margin-bottom:10px;
-            color:#1e3a5f;
-        }
-
-        .hero p{
-            font-size:18px;
-            color:#666;
-        }
 
         /* SEARCH + FILTER */
 
@@ -163,6 +123,11 @@ rel="stylesheet">
         table tr:hover{
             background:#f1f6fc;
         }
+        /* table{
+
+min-width:1700px;
+
+} */
 
         /* STATUS */
 
@@ -552,6 +517,29 @@ rel="stylesheet">
     color:white;
 
 }
+.report-btn{
+
+    background:#27ae60;
+
+    color:white;
+
+    padding:12px 20px;
+
+    border-radius:10px;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.report-btn:hover{
+
+    background:#1f8a4c;
+
+}
     </style>
 
 </head>
@@ -634,32 +622,13 @@ rel="stylesheet">
 
         </div>
         <!-- EXPORT EXCEL BUTTON -->
-        <button class="export-btn" onclick="exportCSV()">
+      <a href="reports.html" class="report-btn">
 
-    <i class="fa-solid fa-file-excel"></i>
-    Export Excel
+    <i class="fa-solid fa-file-lines"></i>
 
-     </button>
-     <button class="pdf-btn" onclick="printPDF()">
+    अहवाल काढा
 
-    <i class="fa-solid fa-file-pdf"></i>
-    Download PDF
-
-    </button>
-    <button class="backup-btn" onclick="backupData()">
-
-    <i class="fa-solid fa-download"></i>
-    Backup Data
-
-</button>
-
-
-<button class="restore-btn" onclick="document.getElementById('restoreFile').click()">
-
-    <i class="fa-solid fa-upload"></i>
-    Restore Data
-
-</button>
+</a>
 
 <!-- HIDDEN FILE INPUT -->
 
@@ -675,29 +644,11 @@ rel="stylesheet">
 
             <select id="statusFilter">
 
-                <option value="All">
-                    All Status
-                </option>
+               <option value="All">सर्व</option>
 
-                <option value="Pending">
-                    Pending
-                </option>
+                <option value="प्रलंबित">प्रलंबित</option>
 
-                <option value="Step 1 Completed">
-                    Step 1 Completed
-                </option>
-
-                <option value="Step 2 Completed">
-                    Step 2 Completed
-                </option>
-
-                <option value="Step 3 Completed">
-                    Step 3 Completed
-                </option>
-
-                <option value="Approved">
-                    Approved
-                </option>
+                <option value="मंजूर">मंजूर</option>
 
             </select>
 
@@ -723,19 +674,21 @@ rel="stylesheet">
 
                     <th>कार्य प्रकार</th>
 
-                    <th>इनपुट दिनांक</th>
+                    <th>प्राप्त दिनांक</th>
 
-                    <th>टप्पा १</th>
+                    <th>फेरफार नोंद</th>
 
-                    <th>टप्पा २</th>
+                    <th>नोटीस तामील</th>
+                
+                    <th>मंजुरीसाठी सादर</th>
 
-                    <th>म्यूटेशन </th>
+                    <th>मंजूर दिनांक</th>
 
-                    <th>टप्पा ३</th>
+                    <th>पूर्ण दिनांक</th>
 
-                    <th>मंजूर</th>
+                    <th>कालावधी</th>
 
-                    <th>स्थिती</th>
+                    <th>कामाची स्थिती</th>
 
                     <th>कृती</th>
 
@@ -786,11 +739,7 @@ rel="stylesheet">
                 <input type="date" id="editStep2">
             </div>
 
-            <div class="modal-group">
-                <label>Mutation Date</label>
-
-                <input type="date" id="editMutation">
-            </div>
+            
 
             <div class="modal-group">
                 <label>Step 3 Date</label>
@@ -802,6 +751,14 @@ rel="stylesheet">
                 <label>Approved Date</label>
 
                 <input type="date" id="editApproved">
+            </div>
+
+            <div class="modal-group">
+            <label>काम पूर्ण दिनांक</label>
+
+            <input
+            type="date"
+            id="editCompletionDate">
             </div>
 
         </div>
@@ -816,9 +773,6 @@ rel="stylesheet">
     <!-- SCRIPT -->
 
 <script type="module" src="script.js"></script>
-<script
-    type="module"
-    src="navbar.js">
-</script>
+<script type="module" src="navbar.js"></script>
 </body>
 </html>

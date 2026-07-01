@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html lang="mr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>अहवाल केंद्र</title>
+
+<link rel="stylesheet"
+href="reports.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
+rel="stylesheet">
+<style>
+     .navbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:white;
+
+    padding:15px 30px;
+
+    box-shadow:
+        0 2px 10px rgba(0,0,0,0.1);
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+}
+
+.logo{
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    color:#ff7b00;
+
+}
+
+.navbar-links{
+
+    display:flex;
+
+    gap:15px;
+
+    list-style:none;
+
+    margin:0;
+
+    padding:0;
+
+}
+
+.navbar-links a{
+
+    text-decoration:none;
+
+    color:#444;
+
+    padding:10px 18px;
+
+    border-radius:12px;
+
+    transition:0.3s;
+
+    font-weight:500;
+
+}
+
+.navbar-links a:hover{
+
+    background:#f5f5f5;
+
+}
+
+.navbar-links a.active{
+
+    background:#ff7b00;
+
+    color:white;
+
+}
+.overlay{
+
+    z-index:1500;
+
+}
+
+.filter-panel{
+
+    z-index:2000;
+
+}
+</style>
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+   <div class="logo">
+
+    ग्राम महसूल अधिकारी निळा
+
+</div>
+
+    <ul class="navbar-links">
+
+        <li>
+
+            <a href="gpt.html">
+
+                🏠 मुख्यपृष्ठ
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="field-visit-manager.html">
+
+                📋 क्षेत्र भेट
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="reports.html"
+               class="active">
+
+                📑 अहवाल
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="account.html">
+
+                👤 माझे खाते
+
+            </a>
+
+        </li>
+
+    </ul>
+
+</nav>
+
+<div class="report-header">
+
+    <h1>अहवाल</h1>
+
+    <div class="header-buttons">
+
+        <button id="filterBtn" class="filter-btn">
+            🔍 फिल्टर
+        </button>
+
+        <button id="downloadBtn" class="download-btn">
+            📥 डाउनलोड
+        </button>
+
+    </div>
+
+</div>
+
+<div id="reportTable">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>शेतकरी</th>
+                <th>गाव</th>
+                <th>दिनांक</th>
+                <th>स्थिती</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="tableBody">
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+
+<!-- Dark Background -->
+
+<div id="overlay" class="overlay"></div>
+
+
+
+<!-- Filter Panel -->
+
+<div id="filterPanel" class="filter-panel">
+
+    <div class="panel-header">
+
+        <h2>फिल्टर</h2>
+
+        <button id="closePanel">
+
+            ✕
+
+        </button>
+
+    </div>
+
+    <div class="filter-group">
+
+        <label>दिनांक पासून</label>
+
+        <input
+            type="date"
+            id="fromDate">
+
+    </div>
+
+    <div class="filter-group">
+
+        <label>दिनांक पर्यंत</label>
+
+        <input
+            type="date"
+            id="toDate">
+
+    </div>
+
+    <div class="filter-group">
+
+        <label>स्थिती</label>
+
+        <select id="status">
+
+            <option value="All">सर्व</option>
+
+            <option>Pending</option>
+
+            <option>Step 1 Completed</option>
+
+            <option>Step 2 Completed</option>
+
+            <option>Step 3 Completed</option>
+
+            <option>Approved</option>
+
+        </select>
+
+    </div>
+
+    <div class="filter-group">
+
+        <label>गाव</label>
+
+        <select id="village">
+
+            <option value="All">
+
+                सर्व
+
+            </option>
+
+        </select>
+
+    </div>
+
+    <div class="filter-group">
+
+        <label>कार्य प्रकार</label>
+
+        <select id="workType">
+
+            <option value="All">
+
+                सर्व
+
+            </option>
+
+        </select>
+
+    </div>
+
+    <div class="panel-buttons">
+
+        <button
+            id="resetFilter"
+            class="reset-btn">
+
+            रीसेट
+
+        </button>
+
+        <button
+            id="applyFilter"
+            class="apply-btn">
+
+            लागू करा
+
+        </button>
+
+    </div>
+
+</div>
+
+
+</div>
+
+<script
+type="module"
+src="reports.js">
+
+</script>
+
+</body>
+
+</html>
