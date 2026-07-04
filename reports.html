@@ -16,95 +16,6 @@ href="reports.css">
 
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
 rel="stylesheet">
-<style>
-     .navbar{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    background:white;
-
-    padding:15px 30px;
-
-    box-shadow:
-        0 2px 10px rgba(0,0,0,0.1);
-
-    position:sticky;
-
-    top:0;
-
-    z-index:1000;
-
-}
-
-.logo{
-
-    font-size:22px;
-
-    font-weight:bold;
-
-    color:#ff7b00;
-
-}
-
-.navbar-links{
-
-    display:flex;
-
-    gap:15px;
-
-    list-style:none;
-
-    margin:0;
-
-    padding:0;
-
-}
-
-.navbar-links a{
-
-    text-decoration:none;
-
-    color:#444;
-
-    padding:10px 18px;
-
-    border-radius:12px;
-
-    transition:0.3s;
-
-    font-weight:500;
-
-}
-
-.navbar-links a:hover{
-
-    background:#f5f5f5;
-
-}
-
-.navbar-links a.active{
-
-    background:#ff7b00;
-
-    color:white;
-
-}
-.overlay{
-
-    z-index:1500;
-
-}
-
-.filter-panel{
-
-    z-index:2000;
-
-}
-</style>
 
 </head>
 
@@ -165,38 +76,163 @@ rel="stylesheet">
 
 </nav>
 
-<div class="report-header">
+<!-- ==========================
+REPORT HEADER
+========================== -->
 
-    <h1>अहवाल</h1>
+<section class="report-header">
+
+    <div>
+
+        <h1>📑 अहवाल केंद्र</h1>
+
+        <p>
+            सर्व शेतकरी कामकाजाचे अहवाल एका ठिकाणी
+        </p>
+
+    </div>
 
     <div class="header-buttons">
 
         <button id="filterBtn" class="filter-btn">
+
             🔍 फिल्टर
+
         </button>
+        
 
         <button id="downloadBtn" class="download-btn">
+
             📥 डाउनलोड
+
         </button>
 
     </div>
 
-</div>
+</section>
 
-<div id="reportTable">
 
-    <table>
+<!-- ==========================
+DASHBOARD CARDS
+========================== -->
 
-        <thead>
+<section class="dashboard">
 
-            <tr>
+    <div class="card" id="cardAll">
 
-                <th>शेतकरी</th>
-                <th>गाव</th>
-                <th>दिनांक</th>
-                <th>स्थिती</th>
+        <h3 id="totalFarmers">0</h3>
 
-            </tr>
+        <p>एकूण प्रकरणे</p>
+
+    </div>
+
+    <div class="card pending" id="cardPending">
+
+        <h3 id="pendingCount">0</h3>
+
+        <p>प्रलंबित</p>
+
+    </div>
+
+    <div class="card completed" id="cardApproved">
+
+        <h3 id="completedCount">0</h3>
+
+        <p>मंजूर</p>
+
+    </div>
+
+    <div class="card ferfar" id="cardFerfar">
+        <h3 id="ferfarCount">0</h3>
+
+        <p>फेरफार</p>
+
+    </div>
+
+    <div class="card other" id="cardOther">
+
+        <h3 id="otherCount">0</h3>
+
+        <p>इतर कामे</p>
+
+    </div>
+
+    <div class="card village" id="cardVillage">
+
+        <h3 id="villageCount">0</h3>
+
+        <p>गावे</p>
+
+    </div>
+
+</section>
+
+
+<!-- ==========================
+REPORT TABS
+========================== -->
+
+<section class="report-tabs">
+
+    <button
+        class="tab-btn active"
+        data-report="farmers">
+
+        👨‍🌾 शेतकरी अहवाल
+
+    </button>
+
+    <button
+        class="tab-btn"
+        data-report="villages">
+
+        🏘 गावनिहाय सारांश
+
+    </button>
+
+    <button
+        class="tab-btn"
+        data-report="worktypes">
+
+        📂 कार्यप्रकारनिहाय सारांश
+
+    </button>
+
+</section>
+
+
+<!-- ==========================
+TABLE
+========================== -->
+
+<section class="table-wrapper">
+
+    <table id="reportTable">
+
+        <thead id="tableHead" style="background:#ff7b00; color:white;">
+            
+
+<tr>
+
+<th>शेतकरी</th>
+
+<th>गाव</th>
+
+<th>कामाचा प्रकार</th>
+
+<th>अर्ज दिनांक</th>
+
+<th>मंजूर दिनांक</th>
+
+<th>पूर्ण दिनांक</th>
+
+<th>कालावधी</th>
+
+<th>स्थिती</th>
+
+</tr>
+
+
 
         </thead>
 
@@ -205,30 +241,62 @@ rel="stylesheet">
         </tbody>
 
     </table>
+    <div id="noDataMessage" class="no-data">
+
+    कोणतीही नोंद उपलब्ध नाही.
 
 </div>
 
+</section>
 
+<!-- ==========================
+DOWNLOAD POPUP
+========================== -->
 
-<!-- Dark Background -->
+<div id="downloadModal" class="download-modal">
+
+    <div class="download-content">
+
+        <h2>
+
+            अहवाल डाउनलोड करा
+
+        </h2>
+
+        <button id="excelBtn">
+
+            📗 Excel
+
+        </button>
+
+        <button id="pdfBtn">
+
+            📕 PDF
+
+        </button>
+
+        <button id="closeDownload">
+
+            बंद करा
+
+        </button>
+
+    </div>
+
+</div>
+<!-- ==========================
+FILTER POPUP
+========================== -->
 
 <div id="overlay" class="overlay"></div>
-
-
-
-<!-- Filter Panel -->
 
 <div id="filterPanel" class="filter-panel">
 
     <div class="panel-header">
 
-        <h2>फिल्टर</h2>
+        <h2>🔍 फिल्टर</h2>
 
-        <button id="closePanel">
-
-            ✕
-
-        </button>
+        <button id="closePanel">✕</button>
 
     </div>
 
@@ -236,9 +304,7 @@ rel="stylesheet">
 
         <label>दिनांक पासून</label>
 
-        <input
-            type="date"
-            id="fromDate">
+        <input type="date" id="fromDate">
 
     </div>
 
@@ -246,9 +312,7 @@ rel="stylesheet">
 
         <label>दिनांक पर्यंत</label>
 
-        <input
-            type="date"
-            id="toDate">
+        <input type="date" id="toDate">
 
     </div>
 
@@ -260,15 +324,9 @@ rel="stylesheet">
 
             <option value="All">सर्व</option>
 
-            <option>Pending</option>
+            <option value="प्रलंबित">प्रलंबित</option>
 
-            <option>Step 1 Completed</option>
-
-            <option>Step 2 Completed</option>
-
-            <option>Step 3 Completed</option>
-
-            <option>Approved</option>
+            <option value="मंजूर">मंजूर</option>
 
         </select>
 
@@ -280,11 +338,15 @@ rel="stylesheet">
 
         <select id="village">
 
-            <option value="All">
+            <option value="All">सर्व</option>          
+                                
+            <option value="निळा">निळा</option>
 
-                सर्व
+            <option value="आलेगांव">आलेगांव</option>
 
-            </option>
+            <option value="पिंपरी महिपाल">पिंपरी महिपाल</option>
+
+            <option value="इतर">इतर</option>
 
         </select>
 
@@ -292,15 +354,28 @@ rel="stylesheet">
 
     <div class="filter-group">
 
-        <label>कार्य प्रकार</label>
+        <label>कामाचा प्रकार</label>
 
         <select id="workType">
 
-            <option value="All">
+            <option value="All">सर्व</option>
+            
 
-                सर्व
+                    <option value="फेरफार">फेरफार</option>
 
-            </option>
+                    <option value="दाखला">दाखला</option>
+
+                    <option value="शंका निरासना/चौकशी">शंका निरासना/चौकशी</option>
+
+                    <option value="अहवाल">अहवाल</option>
+
+                    <option value="विशेष साहाय्य योजना">विशेष साहाय्य योजना</option>
+
+                    <option value="शिधापत्रिका">शिधापत्रिका</option>
+
+                    <option value="तक्रार">तक्रार</option>
+
+                    <option value="इतर">इतर</option>
 
         </select>
 
@@ -308,17 +383,13 @@ rel="stylesheet">
 
     <div class="panel-buttons">
 
-        <button
-            id="resetFilter"
-            class="reset-btn">
+        <button id="resetFilter">
 
             रीसेट
 
         </button>
 
-        <button
-            id="applyFilter"
-            class="apply-btn">
+        <button id="applyFilter">
 
             लागू करा
 
@@ -327,14 +398,15 @@ rel="stylesheet">
     </div>
 
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
 <script
 type="module"
 src="reports.js">
-
 </script>
 
 </body>

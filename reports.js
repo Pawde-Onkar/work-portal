@@ -1,49 +1,168 @@
-import { auth, db }
-from "./firebase.js";
+// ======================================================
+// FIREBASE IMPORTS
+// ======================================================
+
+import { auth, db } from "./firebase.js";
 
 import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+import {
     collection,
     getDocs,
     query,
     where
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-let farmers = [];
+// ======================================================
+// GLOBAL VARIABLES
+// ======================================================
+
+let allFarmers = [];
+
 let filteredFarmers = [];
 
-// =======================
-// LOAD FARMERS
-// =======================
+let currentView = "farmer";
 
-async function loadFarmers() {
 
-    const snapshot =
-        await getDocs(
+// ======================================================
+// DOM ELEMENTS
+// ======================================================
+// ==========================================
+// CURRENT REPORT
+// ==========================================
 
-            query(
+let currentReport = "farmers";
 
-                collection(db, "farmers"),
+const tabButtons =
+document.querySelectorAll(".tab-btn");
 
-                where(
-                    "ownerId",
-                    "==",
-                    auth.currentUser.uid
-                )
+const tableBody =
+    document.getElementById("tableBody");
 
-            )
+const villageSelect =
+    document.getElementById("village");
+
+const workTypeSelect =
+    document.getElementById("workType");
+
+const statusSelect =
+    document.getElementById("status");
+
+const fromDate =
+    document.getElementById("fromDate");
+
+const toDate =
+    document.getElementById("toDate");
+
+
+// Dashboard
+
+const totalWorks =
+document.getElementById("totalFarmers");
+
+const pendingWorks =
+document.getElementById("pendingCount");
+
+const completedWorks =
+document.getElementById("completedCount");
+
+const ferfarWorks =
+document.getElementById("ferfarCount");
+
+const otherWorks =
+document.getElementById("otherCount");
+
+const villagesCount =
+document.getElementById("villageCount");
+
+// ======================================================
+// AUTH CHECK
+// ======================================================
+
+onAuthStateChanged(auth, async (user) => {
+
+    if (!user) {
+
+        window.location.href = "login.html";
+
+        return;
+
+    }
+
+    await loadFarmers(user.uid);
+
+});
+// ======================================================
+// FORMAT DATE
+// ======================================================
+
+function formatDate(date){
+
+    if(!date) return "-";
+
+    return new Date(date)
+        .toLocaleDateString("mr-IN");
+
+}
+
+fromDate.addEventListener("change", () => {
+
+    // User cannot select an earlier end date
+    toDate.min = fromDate.value;
+
+    // If end date is already smaller, clear it
+    if (toDate.value && toDate.value < fromDate.value) {
+        toDate.value = "";
+    }
+
+});
+
+// ======================================================
+// DURATION
+// ======================================================
+
+function calculateDuration(start,end){
+
+    if(!start || !end) return "-";
+
+    const diff =
+        Math.ceil(
+
+            (new Date(end)-new Date(start))
+
+            /(1000*60*60*24)
 
         );
 
-    farmers = [];
+    return diff+" दिवस";
 
-    snapshot.forEach(doc => {
+}
+// ======================================================
+// LOAD ALL FARMERS
+// ======================================================
 
-        farmers.push({
+async function loadFarmers(uid){
 
-            firestoreId: doc.id,
+    const q = query(
+
+        collection(db,"farmers"),
+
+        where("ownerId","==",uid)
+
+    );
+
+    const snapshot = await getDocs(q);
+
+    allFarmers = [];
+
+    snapshot.forEach(doc=>{
+
+        allFarmers.push({
+
+            firestoreId:doc.id,
 
             ...doc.data()
 
@@ -51,311 +170,1105 @@ async function loadFarmers() {
 
     });
 
-    filteredFarmers = [...farmers];
+ 
+    filteredFarmers = [...allFarmers];
 
-    loadVillages();
+    updateDashboard();
 
-    loadWorkTypes();
+    
 
-    displayTable(filteredFarmers);
-
-}
-
-// =======================
-// TABLE
-// =======================
-
-function displayTable(data) {
-
-    const tbody =
-        document.getElementById("tableBody");
-
-    tbody.innerHTML = "";
-
-    if (data.length === 0) {
-
-        tbody.innerHTML =
-
-        `
-            <tr>
-
-                <td colspan="4"
-                    style="text-align:center;">
-
-                    दिलेल्या फिल्टरनुसार कोणतीही माहिती उपलब्ध नाही
-
-                </td>
-
-            </tr>
-        `;
-
-        return;
-
-    }
-
-    data.forEach(farmer => {
-
-        tbody.innerHTML +=
-
-        `
-            <tr>
-
-                <td>${farmer.farmerName || "-"}</td>
-
-                <td>${farmer.village || "-"}</td>
-
-                <td>${farmer.inputDate || "-"}</td>
-
-                <td>${farmer.status || "-"}</td>
-
-            </tr>
-        `;
-
-    });
+    renderCurrentView();
 
 }
 
-// =======================
-// LOAD VILLAGES
-// =======================
+  // ======================================================
+// UPDATE DASHBOARD
+// ======================================================
 
-function loadVillages() {
+function updateDashboard() {
+    if (otherWorks)
+    otherWorks.textContent =
+        allFarmers.filter(f =>
+            f.workType !== "फेरफार"
+        ).length;
 
-    const villageSelect =
-        document.getElementById("village");
+    if (totalWorks)
+        totalWorks.textContent = allFarmers.length;
 
-    villageSelect.innerHTML =
-        `<option value="All">सर्व</option>`;
+    if (pendingWorks)
+        pendingWorks.textContent =
+            allFarmers.filter(f =>
+                f.status === "प्रलंबित"
+            ).length;
 
-    const villages =
-        [...new Set(
+    if (completedWorks)
+        completedWorks.textContent =
+            allFarmers.filter(f =>
+                f.status === "मंजूर"
+            ).length;
 
-            farmers.map(f => f.village)
+    if (ferfarWorks)
+        ferfarWorks.textContent =
+            allFarmers.filter(f =>
+                f.workType === "फेरफार"
+            ).length;
 
-        )];
+    if (villagesCount) {
 
-    villages.sort();
+        const villages = new Set();
 
-    villages.forEach(v => {
+        allFarmers.forEach(f => {
 
-        villageSelect.innerHTML +=
-
-        `
-            <option value="${v}">
-                ${v}
-            </option>
-        `;
-
-    });
-
-}
-
-// =======================
-// LOAD WORK TYPES
-// =======================
-
-function loadWorkTypes() {
-
-    const workSelect =
-        document.getElementById("workType");
-
-    workSelect.innerHTML =
-        `<option value="All">सर्व</option>`;
-
-    const works =
-        [...new Set(
-
-            farmers.map(f => f.workType)
-
-        )];
-
-    works.sort();
-
-    works.forEach(w => {
-
-        workSelect.innerHTML +=
-
-        `
-            <option value="${w}">
-                ${w}
-            </option>
-        `;
-
-    });
-
-}
-
-// =======================
-// APPLY FILTER
-// =======================
-
-document
-.getElementById("applyFilter")
-.onclick = () => {
-
-
-const fromDate = fromDateInput.value;
-const toDate = toDateInput.value;
-
-    const village =
-        document.getElementById("village").value;
-
-    const workType =
-        document.getElementById("workType").value;
-
-    const status =
-        document.getElementById("status").value;
-        
-
-       
-
-
-    filteredFarmers =
-        farmers.filter(f => {
-
-            let ok = true;
-
-            if (
-                fromDate &&
-                f.inputDate &&
-                f.inputDate < fromDate
-            )
-                ok = false;
-
-            if (
-                toDate &&
-                f.inputDate &&
-                f.inputDate > toDate
-            )
-
-                ok = false;
-
-            if (
-
-                village !== "All" &&
-                f.village !== village
-
-            )
-
-                ok = false;
-
-            if (
-
-                workType !== "All" &&
-                f.workType !== workType
-
-            )
-
-                ok = false;
-
-            if (
-
-                status !== "All" &&
-                f.status !== status
-
-            )
-
-                ok = false;
-
-            return ok;
+            if (f.village)
+                villages.add(f.village);
 
         });
 
-    displayTable(filteredFarmers);
+        villagesCount.textContent =
+            villages.size;
 
-    panel.classList.remove("active");
+    }
 
-    overlay.classList.remove("active");
+}
 
-};
+const cardAll =
+document.getElementById("cardAll");
 
-// =======================
-// RESET FILTER
-// =======================
+const cardPending =
+document.getElementById("cardPending");
 
-document
-.getElementById("resetFilter")
-.onclick = () => {
+const cardApproved =
+document.getElementById("cardApproved");
 
-    document.getElementById("fromDate").value = "";
+const cardFerfar =
+document.getElementById("cardFerfar");
 
-    document.getElementById("toDate").value = "";
-    toDateInput.min = "";
+const cardOther =
+document.getElementById("cardOther");
 
-    document.getElementById("village").value = "All";
+const cardVillage =
+document.getElementById("cardVillage");
 
-    document.getElementById("workType").value = "All";
 
-    document.getElementById("status").value = "All";
+cardAll.addEventListener("click",()=>{
 
-    filteredFarmers = [...farmers];
+    filteredFarmers=[...allFarmers];
 
-    displayTable(filteredFarmers);
+    currentReport="farmers";
 
-};
+    document.querySelector('[data-report="farmers"]')
+        .click();
 
-// =======================
-// FILTER PANEL
-// =======================
-
-const filterBtn =
-document.getElementById("filterBtn");
-
-const panel =
-document.getElementById("filterPanel");
-
-const overlay =
-document.getElementById("overlay");
-
-const closeBtn =
-document.getElementById("closePanel");
-
-   const fromDateInput = document.getElementById("fromDate");
-const toDateInput = document.getElementById("toDate");
-
-fromDateInput.addEventListener("change", () => {
-    toDateInput.min = fromDateInput.value;
 });
 
-filterBtn.onclick = () => {
+cardPending.addEventListener("click",()=>{
 
-    panel.classList.add("active");
+    filteredFarmers=
 
-    overlay.classList.add("active");
+    allFarmers.filter(f=>
 
-};
+        f.status==="प्रलंबित"
 
-closeBtn.onclick = () => {
+    );
 
-    panel.classList.remove("active");
+    document.querySelector('[data-report="farmers"]')
+        .click();
 
-    overlay.classList.remove("active");
+});
 
-};
+cardApproved.addEventListener("click",()=>{
 
-overlay.onclick = () => {
+    filteredFarmers=
 
-    panel.classList.remove("active");
+    allFarmers.filter(f=>
 
-    overlay.classList.remove("active");
+        f.status==="मंजूर"
 
-};
+    );
 
-// =======================
-// AUTH
-// =======================
+    document.querySelector('[data-report="farmers"]')
+        .click();
 
-auth.onAuthStateChanged(user => {
+});
 
-    if (!user) {
+cardFerfar.addEventListener("click",()=>{
 
-        window.location.href =
-            "login.html";
+    filteredFarmers=
+
+    allFarmers.filter(f=>
+
+        f.workType==="फेरफार"
+
+    );
+
+    document.querySelector('[data-report="farmers"]')
+        .click();
+
+});
+
+cardOther.addEventListener("click",()=>{
+
+    filteredFarmers=
+
+    allFarmers.filter(f=>
+
+        f.workType!=="फेरफार"
+
+    );
+
+    document.querySelector('[data-report="farmers"]')
+        .click();
+
+});
+
+cardVillage.addEventListener("click",()=>{
+
+    filteredFarmers=[...allFarmers];
+
+    document.querySelector('[data-report="villages"]')
+        .click();
+
+});
+// ======================================================
+// POPULATE FILTERS
+// ======================================================
+
+
+// ======================================================
+// FILTER POPUP
+// ======================================================
+
+const overlay =
+    document.getElementById("overlay");
+
+const filterPanel =
+    document.getElementById("filterPanel");
+
+const filterBtn =
+    document.getElementById("filterBtn");
+
+const closePanel =
+    document.getElementById("closePanel");
+
+if(filterBtn){
+
+    filterBtn.addEventListener("click",()=>{
+
+        overlay.style.display="block";
+
+        filterPanel.classList.add("show");
+
+    });
+
+}
+
+if(closePanel){
+
+    closePanel.addEventListener("click",closeFilter);
+
+}
+
+if(overlay){
+
+    overlay.addEventListener("click",closeFilter);
+
+}
+
+function closeFilter(){
+
+    overlay.style.display="none";
+
+    filterPanel.classList.remove("show");
+
+}
+// ======================================================
+// APPLY FILTER
+// ======================================================
+
+const applyFilter =
+    document.getElementById("applyFilter");
+
+if(applyFilter){
+
+    applyFilter.addEventListener(
+
+        "click",
+
+        applyFilters
+
+    );
+
+}
+
+function applyFilters(){
+
+    filteredFarmers=[...allFarmers];
+
+    //---------------------------------------------------
+    // Date
+    //---------------------------------------------------
+
+    const from=fromDate.value;
+
+    const to=toDate.value;
+
+    if(from){
+
+        filteredFarmers=
+
+        filteredFarmers.filter(f=>
+
+            f.inputDate>=from
+
+        );
+
+    }
+
+    if(to){
+
+        filteredFarmers=
+
+        filteredFarmers.filter(f=>
+
+            f.inputDate<=to
+
+        );
+
+    }
+
+    //---------------------------------------------------
+    // Status
+    //---------------------------------------------------
+
+    if(statusSelect.value!="All"){
+
+        filteredFarmers=
+
+        filteredFarmers.filter(f=>
+
+            f.status===statusSelect.value
+
+        );
+
+    }
+
+    //---------------------------------------------------
+    // Village
+    //---------------------------------------------------
+
+    if(villageSelect.value!="All"){
+
+        filteredFarmers=
+
+        filteredFarmers.filter(f=>
+
+            f.village===villageSelect.value
+
+        );
+
+    }
+
+    //---------------------------------------------------
+    // Work Type
+    //---------------------------------------------------
+
+    if(workTypeSelect.value!="All"){
+
+        filteredFarmers=
+
+        filteredFarmers.filter(f=>
+
+            f.workType===workTypeSelect.value
+
+        );
+
+    }
+
+    closeFilter();
+
+    renderCurrentView();
+
+}
+// ======================================================
+// RESET FILTER
+// ======================================================
+
+const resetFilter=
+document.getElementById("resetFilter");
+
+if(resetFilter){
+
+    resetFilter.addEventListener(
+
+        "click",
+
+        ()=>{
+
+            fromDate.value="";
+
+            toDate.value="";
+
+            villageSelect.value="All";
+
+            workTypeSelect.value="All";
+
+            statusSelect.value="All";
+
+            filteredFarmers=[...allFarmers];
+
+            renderCurrentView();
+
+            closeFilter();
+
+        }
+
+    );
+
+}
+// ======================================================
+// CURRENT VIEW
+// ======================================================
+
+// ==========================================
+// RENDER CURRENT VIEW
+// ==========================================
+
+function renderCurrentView(){
+
+    switch(currentReport){
+
+        case "farmers":
+
+            displayFarmerTable();
+
+            break;
+
+        case "villages":
+
+            displayVillageSummary();
+
+            break;
+
+        case "worktypes":
+
+            displayWorkTypeSummary();
+
+            break;
+
+    }
+
+}
+ 
+// ======================================================
+// FARMER REPORT TABLE
+// ======================================================
+
+function displayFarmerTable() {
+
+    if (!tableBody) return;
+    document.getElementById("tableHead").innerHTML = `
+
+<tr>
+
+<th>शेतकरी</th>
+
+<th>गाव</th>
+
+<th>कामाचा प्रकार</th>
+
+<th>अर्ज दिनांक</th>
+
+<th>मंजूर दिनांक</th>
+
+<th>पूर्ण दिनांक</th>
+
+<th>कालावधी</th>
+
+<th>स्थिती</th>
+
+</tr>
+
+`;
+
+    tableBody.innerHTML = "";
+
+    //--------------------------------------------------
+    // No Records
+    //--------------------------------------------------
+
+    if (filteredFarmers.length === 0) {
+
+       let html = "";
+
+filteredFarmers.forEach(farmer => {
+
+    html += `
+    <tr>
+        ...
+    </tr>
+    `;
+
+});
+
+tableBody.innerHTML = html;
 
         return;
 
     }
 
-    loadFarmers();
+    //--------------------------------------------------
+    // Rows
+    //--------------------------------------------------
+
+    filteredFarmers.forEach(farmer => {
+
+        const duration =
+            calculateDuration(
+                farmer.inputDate,
+                farmer.completionDate
+            );
+
+        const statusClass =
+
+            farmer.status === "मंजूर"
+
+                ? "approved"
+
+                : "pending";
+
+        tableBody.innerHTML += `
+
+        <tr>
+
+            <td>${farmer.farmerName}</td>
+
+            <td>${farmer.village}</td>
+
+            <td>${farmer.workType}</td>
+
+            <td>${formatDate(farmer.inputDate)}</td>
+
+            <td>${formatDate(farmer.approvedDate)}</td>
+
+            <td>${formatDate(farmer.completionDate)}</td>
+
+            <td>${duration}</td>
+
+            <td>
+
+                <span class="status ${statusClass}">
+
+                    ${farmer.status}
+
+                </span>
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+// ==========================================
+// VILLAGE SUMMARY
+// ==========================================
+
+function displayVillageSummary() {
+
+    document.getElementById("tableHead").innerHTML = `
+
+    <tr>
+
+        <th>गाव</th>
+
+        <th>एकूण प्रकरणे</th>
+
+        <th>मंजूर</th>
+
+        <th>प्रलंबित</th>
+
+        <th>फेरफार</th>
+
+        <th>इतर</th>
+
+    </tr>
+
+    `;
+
+    tableBody.innerHTML = "";
+
+    const villageMap = {};
+
+    filteredFarmers.forEach(farmer => {
+
+        const village = farmer.village || "अज्ञात";
+
+        if (!villageMap[village]) {
+
+            villageMap[village] = {
+
+                total: 0,
+
+                approved: 0,
+
+                pending: 0,
+
+                ferfar: 0,
+
+                other: 0
+
+            };
+
+        }
+
+        villageMap[village].total++;
+
+        if (farmer.status === "मंजूर")
+            villageMap[village].approved++;
+        else
+            villageMap[village].pending++;
+
+        if (farmer.workType === "फेरफार")
+            villageMap[village].ferfar++;
+        else
+            villageMap[village].other++;
+
+    });
+
+    Object.keys(villageMap)
+        .sort()
+        .forEach(village => {
+
+            const v = villageMap[village];
+
+            tableBody.innerHTML += `
+
+            <tr>
+
+                <td>${village}</td>
+
+                <td>${v.total}</td>
+
+                <td>${v.approved}</td>
+
+                <td>${v.pending}</td>
+
+                <td>${v.ferfar}</td>
+
+                <td>${v.other}</td>
+
+            </tr>
+
+            `;
+
+        });
+
+}
+
+// ==========================================
+// WORK TYPE SUMMARY
+// ==========================================
+
+function displayWorkTypeSummary() {
+
+    document.getElementById("tableHead").innerHTML = `
+
+    <tr>
+
+        <th>कामाचा प्रकार</th>
+
+        <th>एकूण प्रकरणे</th>
+
+        <th>मंजूर</th>
+
+        <th>प्रलंबित</th>
+
+        <th>सरासरी कालावधी</th>
+
+    </tr>
+
+    `;
+
+    tableBody.innerHTML = "";
+
+    const workMap = {};
+
+    filteredFarmers.forEach(farmer => {
+
+        const type = farmer.workType || "इतर";
+
+        if (!workMap[type]) {
+
+            workMap[type] = {
+
+                total: 0,
+
+                approved: 0,
+
+                pending: 0,
+
+                totalDays: 0,
+
+                completedCount: 0
+
+            };
+
+        }
+
+        workMap[type].total++;
+
+        if (farmer.status === "मंजूर") {
+
+            workMap[type].approved++;
+
+        } else {
+
+            workMap[type].pending++;
+
+        }
+
+        //--------------------------------------------------
+        // Average Duration
+        //--------------------------------------------------
+
+        if (farmer.inputDate && farmer.completionDate) {
+
+            const days = Math.ceil(
+
+                (new Date(farmer.completionDate) -
+                 new Date(farmer.inputDate))
+
+                / (1000 * 60 * 60 * 24)
+
+            );
+
+            if (days >= 0) {
+
+                workMap[type].totalDays += days;
+
+                workMap[type].completedCount++;
+
+            }
+
+        }
+
+    });
+
+    Object.keys(workMap)
+        .sort()
+        .forEach(type => {
+
+            const w = workMap[type];
+
+            const avg =
+
+                w.completedCount === 0
+
+                ? "-"
+
+                : Math.round(
+
+                    w.totalDays /
+
+                    w.completedCount
+
+                  ) + " दिवस";
+
+            tableBody.innerHTML += `
+
+            <tr>
+
+                <td>${type}</td>
+
+                <td>${w.total}</td>
+
+                <td>${w.approved}</td>
+
+                <td>${w.pending}</td>
+
+                <td>${avg}</td>
+
+            </tr>
+
+            `;
+
+        });
+
+}
+// ==========================================
+// TAB SWITCHING
+// ==========================================
+
+tabButtons.forEach(button=>{
+
+    button.addEventListener("click",()=>{
+
+        //------------------------------------------------
+
+        tabButtons.forEach(btn=>{
+
+            btn.classList.remove("active");
+
+        });
+
+        //------------------------------------------------
+
+        button.classList.add("active");
+
+        //------------------------------------------------
+
+        currentReport =
+        button.dataset.report;
+
+        //------------------------------------------------
+
+        renderCurrentView();
+
+    });
 
 });
+
+const downloadBtn =
+document.getElementById("downloadBtn");
+
+const downloadModal =
+document.getElementById("downloadModal");
+
+const closeDownload =
+document.getElementById("closeDownload");
+
+if(downloadBtn){
+
+    downloadBtn.addEventListener("click",()=>{
+
+        downloadModal.style.display="flex";
+
+    });
+
+}
+
+if(closeDownload){
+
+    closeDownload.addEventListener("click",()=>{
+
+        downloadModal.style.display="none";
+
+    });
+
+}
+const excelBtn =
+document.getElementById("excelBtn");
+
+if(excelBtn){
+
+    excelBtn.addEventListener(
+
+        "click",
+
+        exportExcel
+
+    );
+
+}
+const pdfBtn =
+document.getElementById("pdfBtn");
+
+if(pdfBtn){
+
+    pdfBtn.addEventListener(
+
+        "click",
+
+        exportPDF
+
+    );
+
+}
+function getCurrentTableData(){
+
+    switch(currentReport){
+
+        case "farmers":
+
+            return filteredFarmers.map(f=>({
+
+                "शेतकरी":f.farmerName,
+
+                "गाव":f.village,
+
+                "काम":f.workType,
+
+                "अर्ज":formatDate(f.inputDate),
+
+                "मंजूर":formatDate(f.approvedDate),
+
+                "पूर्ण":formatDate(f.completionDate),
+
+                "कालावधी":calculateDuration(
+
+                    f.inputDate,
+
+                    f.completionDate
+
+                ),
+
+                "स्थिती":f.status
+
+            }));
+
+
+        case "villages":{
+
+            const data=[];
+
+            const villageMap={};
+
+            filteredFarmers.forEach(f=>{
+
+                if(!villageMap[f.village]){
+
+                    villageMap[f.village]={
+
+                        total:0,
+
+                        approved:0,
+
+                        pending:0
+
+                    };
+
+                }
+
+                villageMap[f.village].total++;
+
+                if(f.status==="मंजूर")
+
+                    villageMap[f.village].approved++;
+
+                else
+
+                    villageMap[f.village].pending++;
+
+            });
+
+            Object.keys(villageMap).forEach(v=>{
+
+                data.push({
+
+                    "गाव":v,
+
+                    "एकूण":villageMap[v].total,
+
+                    "मंजूर":villageMap[v].approved,
+
+                    "प्रलंबित":villageMap[v].pending
+
+                });
+
+            });
+
+            return data;
+
+        }
+
+
+        case "worktypes":{
+
+            const data=[];
+
+            const workMap={};
+
+            filteredFarmers.forEach(f=>{
+
+                if(!workMap[f.workType]){
+
+                    workMap[f.workType]={
+
+                        total:0,
+
+                        approved:0,
+
+                        pending:0
+
+                    };
+
+                }
+
+                workMap[f.workType].total++;
+
+                if(f.status==="मंजूर")
+
+                    workMap[f.workType].approved++;
+
+                else
+
+                    workMap[f.workType].pending++;
+
+            });
+
+            Object.keys(workMap).forEach(w=>{
+
+                data.push({
+
+                    "काम":w,
+
+                    "एकूण":workMap[w].total,
+
+                    "मंजूर":workMap[w].approved,
+
+                    "प्रलंबित":workMap[w].pending
+
+                });
+
+            });
+
+            return data;
+
+        }
+
+    }
+
+}
+
+// ==========================================
+// EXPORT EXCEL
+// ==========================================
+
+function exportExcel() {
+
+    const data = getCurrentTableData();
+
+    if (data.length === 0) {
+
+        alert("डाउनलोड करण्यासाठी माहिती उपलब्ध नाही.");
+
+        return;
+
+    }
+
+    const worksheet =
+        XLSX.utils.json_to_sheet(data);
+
+    const workbook =
+        XLSX.utils.book_new();
+
+    let sheetName = "Report";
+
+    if (currentReport === "farmers")
+        sheetName = "शेतकरी";
+
+    if (currentReport === "villages")
+        sheetName = "गावनिहाय";
+
+    if (currentReport === "worktypes")
+        sheetName = "कार्यप्रकार";
+
+    XLSX.utils.book_append_sheet(
+
+        workbook,
+
+        worksheet,
+
+        sheetName
+
+    );
+
+    XLSX.writeFile(
+
+        workbook,
+
+        `${sheetName}_Report.xlsx`
+
+    );
+
+    downloadModal.style.display = "none";
+
+}
+
+// ==========================================
+// EXPORT PDF
+// ==========================================
+
+function exportPDF() {
+
+    const data = getCurrentTableData();
+
+    if (data.length === 0) {
+
+        alert("डाउनलोड करण्यासाठी माहिती उपलब्ध नाही.");
+
+        return;
+
+    }
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF({
+
+        orientation: "landscape",
+
+        unit: "mm",
+
+        format: "a4"
+
+    });
+
+    //----------------------------------------------------
+    // Title
+    //----------------------------------------------------
+
+    let title = "Report";
+
+    if (currentReport === "farmers")
+        title = "Farmer Report";
+
+    if (currentReport === "villages")
+        title = "Village Summary";
+
+    if (currentReport === "worktypes")
+        title = "Work Type Summary";
+
+    doc.setFontSize(18);
+
+    doc.text(title, 14, 15);
+
+    //----------------------------------------------------
+    // Table
+    //----------------------------------------------------
+
+    const headers = [Object.keys(data[0])];
+
+    const rows = data.map(row => Object.values(row));
+
+    doc.autoTable({
+
+        head: headers,
+
+        body: rows,
+
+        startY: 25,
+
+        styles: {
+
+            fontSize: 9,
+
+            halign: "center"
+
+        },
+
+        headStyles: {
+
+            fillColor: [255,123,0]
+
+        }
+
+    });
+
+    doc.save(title + ".pdf");
+
+    downloadModal.style.display = "none";
+
+}
