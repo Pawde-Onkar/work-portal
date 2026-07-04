@@ -32,6 +32,15 @@ function fileToBase64(file) {
     });
 
 }
+const visitDate = document.getElementById("visitDate");
+
+if (visitDate) {
+
+    const today = new Date().toISOString().split("T")[0];
+
+    visitDate.max = today;
+
+}
 
 
 const form =

@@ -136,23 +136,20 @@ async function loadVisit() {
         <h2>${visit.farmerName}</h2>
 
         <p>
-            <strong>Village:</strong>
+            <strong>गाव:</strong>
             ${visit.village}
         </p>
 
         <p>
-            <strong>Visit Date:</strong>
+            <strong>भेटीचा दिनांक:</strong>
             ${visit.visitDate}
         </p>
 
-        <p>
-            <strong>Visit Type:</strong>
-            ${visit.visitType}
-        </p>
+        
 
         <hr>
 
-        <h3>Observation</h3>
+        <h3>भेटीचा संक्षिप्त तपशील :</h3>
 
         <p>
             ${visit.observation}
@@ -160,19 +157,9 @@ async function loadVisit() {
 
         <hr>
 
-        <h3>Analysis</h3>
+       
 
-        <p>
-            ${visit.analysis}
-        </p>
-
-        <hr>
-
-        <h3>Recommendation</h3>
-
-        <p>
-            ${visit.recommendation}
-        </p>
+       
 
         ${photosHtml}
 
@@ -309,7 +296,7 @@ if (
 
                     new Paragraph({
 
-                        text: "FIELD VISIT REPORT",
+                        text: "क्षेत्र भेट अहवाल",
 
                         heading:
                             HeadingLevel.TITLE
@@ -330,15 +317,13 @@ if (
                         `Visit Date: ${visit.visitDate}`
                     ),
 
-                    new Paragraph(
-                        `Visit Type: ${visit.visitType}`
-                    ),
+                   
 
                     new Paragraph(""),
 
                     new Paragraph({
 
-                        text: "Observation",
+                        text: "भेटीचा संक्षिप्त तपशील",
 
                         heading:
                             HeadingLevel.HEADING_1
@@ -350,34 +335,7 @@ if (
                     ),
 
                     new Paragraph(""),
-
-                    new Paragraph({
-
-                        text: "Analysis",
-
-                        heading:
-                            HeadingLevel.HEADING_1
-
-                    }),
-
-                    new Paragraph(
-                        visit.analysis
-                    ),
-
-                    new Paragraph(""),
-
-                    new Paragraph({
-
-                        text: "Recommendation",
-
-                        heading:
-                            HeadingLevel.HEADING_1
-
-                    }),
-
-                    new Paragraph(
-                        visit.recommendation
-                    ),
+                                                    
                    ...photoParagraphs,
                    ...documentParagraphs
 
@@ -407,7 +365,7 @@ async function generatePDFReport() {
     let y = 20;
 
     pdf.setFontSize(18);
-    pdf.text("FIELD VISIT REPORT", 20, y);
+    pdf.text("क्षेत्र भेट अहवाल", 20, y);
 
     y += 15;
 
