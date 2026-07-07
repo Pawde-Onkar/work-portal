@@ -228,15 +228,6 @@ for(let file of documentFiles){
                         "observation"
                     ).value,
 
-                analysis:
-                    document.getElementById(
-                        "analysis"
-                    ).value,
-
-                recommendation:
-                    document.getElementById(
-                        "recommendation"
-                    ).value,
 
                 photos:
                     photos,
