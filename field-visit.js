@@ -218,10 +218,7 @@ for(let file of documentFiles){
                         "visitDate"
                     ).value,
 
-                visitType:
-                    document.getElementById(
-                        "visitType"
-                    ).value,
+                
 
                 observation:
                     document.getElementById(
