@@ -67,11 +67,7 @@ async function loadAccount() {
                 db,
                 "farmers"
             ),
-            where(
-                "createdBy",
-                "==",
-                user.uid
-            )
+           where("ownerId", "==", user.uid)
         );
 
     const farmerSnapshot =
@@ -87,13 +83,15 @@ async function loadAccount() {
     // Field Visit Count
     // currently total visits
 
-    const visitSnapshot =
-        await getDocs(
-            collection(
-                db,
-                "fieldVisits"
-            )
-        );
+    const visitQuery = query(
+    collection(db, "fieldVisits"),
+    where("userId", "==", user.uid)
+);
+
+const visitSnapshot = await getDocs(visitQuery);
+
+document.getElementById("visitCount").textContent =
+    visitSnapshot.size;
 
     document.getElementById(
         "visitCount"
