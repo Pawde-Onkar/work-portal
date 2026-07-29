@@ -1,8 +1,8 @@
 import { auth, db }
 from "./firebase.js";
-
 import {
-    signInWithEmailAndPassword
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -11,6 +11,7 @@ import {
     getDoc
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 
 async function login(expectedRole){
 
@@ -117,3 +118,37 @@ document
     "click",
     () => login("admin")
 );
+document.getElementById("forgotPassword")
+.addEventListener("click", async (e) => {
+
+    e.preventDefault();
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    if (!email) {
+
+        alert("Please enter your email address first.");
+
+        return;
+
+    }
+
+    try {
+
+        await sendPasswordResetEmail(auth, email);
+
+        alert(
+            "A password reset link has been sent to your email."
+        );
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+
+});
