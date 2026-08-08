@@ -1223,97 +1223,111 @@ async function exportPDF() {
     if (currentReport === "worktypes")
         title = "कामाच्या प्रकारानुसार अहवाल";
 
-    // Create printable container offscreen
-    const printArea = document.createElement("div");
-    printArea.style.position = "absolute";
-    printArea.style.left = "-9999px";
-    printArea.style.top = "0";
-    printArea.style.width = "1100px";
-    printArea.style.padding = "25px";
-    printArea.style.backgroundColor = "#ffffff";
-    printArea.style.fontFamily = "'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif";
-
-    // Title
-    const titleEl = document.createElement("h2");
-    titleEl.textContent = title;
-    titleEl.style.textAlign = "center";
-    titleEl.style.color = "#333333";
-    titleEl.style.marginBottom = "20px";
-    titleEl.style.fontSize = "24px";
-    printArea.appendChild(titleEl);
-
-    // Clone table
     const originalTable = document.getElementById("reportTable");
-    const tableClone = originalTable.cloneNode(true);
-    tableClone.style.width = "100%";
-    tableClone.style.borderCollapse = "collapse";
-    tableClone.style.fontSize = "13px";
+    const headerHTML = originalTable.querySelector("thead").innerHTML;
+    const bodyRows = Array.from(originalTable.querySelectorAll("tbody tr"));
 
-    // Styling
-    const ths = tableClone.querySelectorAll("th");
-    ths.forEach(th => {
-        th.style.background = "#ff7b00";
-        th.style.color = "#ffffff";
-        th.style.padding = "10px 8px";
-        th.style.border = "1px solid #cccccc";
-        th.style.textAlign = "center";
+    // Number of rows per page to guarantee clean page breaks without row splitting
+    const rowsPerPage = 12;
+    const totalPages = Math.ceil(bodyRows.length / rowsPerPage) || 1;
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4"
     });
 
-    const tds = tableClone.querySelectorAll("td");
-    tds.forEach(td => {
-        td.style.padding = "8px 6px";
-        td.style.border = "1px solid #cccccc";
-        td.style.color = "#333333";
-        td.style.textAlign = "center";
-    });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const margin = 10;
+    const imgWidth = pageWidth - (margin * 2);
 
-    printArea.appendChild(tableClone);
-    document.body.appendChild(printArea);
+    for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
+        const startRow = pageIdx * rowsPerPage;
+        const pageRows = bodyRows.slice(startRow, startRow + rowsPerPage);
 
-    try {
-        const canvas = await html2canvas(printArea, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: "#ffffff"
+        // Offscreen page container with exact A4 landscape aspect scale
+        const pageDiv = document.createElement("div");
+        pageDiv.style.position = "absolute";
+        pageDiv.style.left = "-9999px";
+        pageDiv.style.top = "0";
+        pageDiv.style.width = "1100px";
+        pageDiv.style.padding = "25px";
+        pageDiv.style.backgroundColor = "#ffffff";
+        pageDiv.style.boxSizing = "border-box";
+        pageDiv.style.fontFamily = "'Segoe UI', Roboto, 'Noto Sans Devanagari', sans-serif";
+
+        // Title
+        const titleEl = document.createElement("h2");
+        titleEl.textContent = `${title} (पान ${pageIdx + 1} पैकी ${totalPages})`;
+        titleEl.style.textAlign = "center";
+        titleEl.style.color = "#1e3a5f";
+        titleEl.style.marginBottom = "16px";
+        titleEl.style.fontSize = "22px";
+        pageDiv.appendChild(titleEl);
+
+        // Table
+        const table = document.createElement("table");
+        table.style.width = "100%";
+        table.style.borderCollapse = "collapse";
+        table.style.fontSize = "13px";
+
+        const thead = document.createElement("thead");
+        thead.innerHTML = headerHTML;
+        thead.querySelectorAll("th").forEach(th => {
+            th.style.background = "#ff7b00";
+            th.style.color = "#ffffff";
+            th.style.padding = "10px 8px";
+            th.style.border = "1px solid #cccccc";
+            th.style.textAlign = "center";
+            th.style.fontSize = "13px";
         });
+        table.appendChild(thead);
 
-        document.body.removeChild(printArea);
-
-        const imgData = canvas.toDataURL("image/png");
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-            orientation: "landscape",
-            unit: "mm",
-            format: "a4"
+        const tbody = document.createElement("tbody");
+        pageRows.forEach(tr => {
+            const trClone = tr.cloneNode(true);
+            trClone.querySelectorAll("td").forEach(td => {
+                td.style.padding = "8px 6px";
+                td.style.border = "1px solid #cccccc";
+                td.style.color = "#333333";
+                td.style.textAlign = "center";
+                td.style.fontSize = "12px";
+            });
+            tbody.appendChild(trClone);
         });
+        table.appendChild(tbody);
+        pageDiv.appendChild(table);
 
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 10;
-        const imgWidth = pageWidth - (margin * 2);
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        document.body.appendChild(pageDiv);
 
-        let heightLeft = imgHeight;
-        let position = margin;
+        try {
+            const canvas = await html2canvas(pageDiv, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#ffffff"
+            });
 
-        pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
-        heightLeft -= (pageHeight - (margin * 2));
+            document.body.removeChild(pageDiv);
 
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight + margin;
-            pdf.addPage();
-            pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
-            heightLeft -= (pageHeight - (margin * 2));
+            const imgData = canvas.toDataURL("image/png");
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            if (pageIdx > 0) {
+                pdf.addPage();
+            }
+
+            pdf.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight);
+        } catch (error) {
+            console.error("PDF generation error:", error);
+            if (pageDiv.parentNode) {
+                document.body.removeChild(pageDiv);
+            }
+            alert("PDF तयार करताना त्रुटी आली.");
+            return;
         }
-
-        pdf.save(`${title}.pdf`);
-
-    } catch (error) {
-        console.error("PDF Export error:", error);
-        if (printArea.parentNode) {
-            document.body.removeChild(printArea);
-        }
-        alert("PDF तयार करताना त्रुटी आली.");
     }
+
+    pdf.save(`${title}.pdf`);
 
 }
