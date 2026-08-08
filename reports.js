@@ -586,6 +586,8 @@ function displayFarmerTable() {
 
 <th>स्थिती</th>
 
+<th>टिप्पणी</th>
+
 </tr>
 
 `;
@@ -663,6 +665,8 @@ tableBody.innerHTML = html;
                 </span>
 
             </td>
+
+            <td>${farmer.remarks || "-"}</td>
 
         </tr>
 
@@ -1015,7 +1019,9 @@ function getCurrentTableData(){
 
                 ),
 
-                "स्थिती":f.status
+                "स्थिती":f.status,
+
+                "टिप्पणी":f.remarks || "-"
 
             }));
 
