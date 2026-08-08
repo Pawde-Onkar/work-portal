@@ -570,6 +570,8 @@ function displayFarmerTable() {
 
 <tr>
 
+<th>अ. क्र.</th>
+
 <th>शेतकरी</th>
 
 <th>गाव</th>
@@ -622,7 +624,7 @@ tableBody.innerHTML = html;
     // Rows
     //--------------------------------------------------
 
-    filteredFarmers.forEach(farmer => {
+    filteredFarmers.forEach((farmer, index) => {
 
         const duration =
             calculateDuration(
@@ -641,6 +643,8 @@ tableBody.innerHTML = html;
         tableBody.innerHTML += `
 
         <tr>
+
+            <td>${index + 1}</td>
 
             <td>${farmer.farmerName}</td>
 
@@ -685,6 +689,8 @@ function displayVillageSummary() {
     document.getElementById("tableHead").innerHTML = `
 
     <tr>
+
+        <th>अ. क्र.</th>
 
         <th>गाव</th>
 
@@ -744,13 +750,15 @@ function displayVillageSummary() {
 
     Object.keys(villageMap)
         .sort()
-        .forEach(village => {
+        .forEach((village, index) => {
 
             const v = villageMap[village];
 
             tableBody.innerHTML += `
 
             <tr>
+
+                <td>${index + 1}</td>
 
                 <td>${village}</td>
 
@@ -781,6 +789,8 @@ function displayWorkTypeSummary() {
     document.getElementById("tableHead").innerHTML = `
 
     <tr>
+
+        <th>अ. क्र.</th>
 
         <th>कामाचा प्रकार</th>
 
@@ -863,7 +873,7 @@ function displayWorkTypeSummary() {
 
     Object.keys(workMap)
         .sort()
-        .forEach(type => {
+        .forEach((type, index) => {
 
             const w = workMap[type];
 
@@ -884,6 +894,8 @@ function displayWorkTypeSummary() {
             tableBody.innerHTML += `
 
             <tr>
+
+                <td>${index + 1}</td>
 
                 <td>${type}</td>
 
@@ -997,7 +1009,9 @@ function getCurrentTableData(){
 
         case "farmers":
 
-            return filteredFarmers.map(f=>({
+            return filteredFarmers.map((f, index)=>({
+
+                "अ. क्र.": index + 1,
 
                 "शेतकरी":f.farmerName,
 
@@ -1060,9 +1074,11 @@ function getCurrentTableData(){
 
             });
 
-            Object.keys(villageMap).forEach(v=>{
+            Object.keys(villageMap).sort().forEach((v, index)=>{
 
                 data.push({
+
+                    "अ. क्र.": index + 1,
 
                     "गाव":v,
 
@@ -1115,9 +1131,11 @@ function getCurrentTableData(){
 
             });
 
-            Object.keys(workMap).forEach(w=>{
+            Object.keys(workMap).sort().forEach((w, index)=>{
 
                 data.push({
+
+                    "अ. क्र.": index + 1,
 
                     "काम":w,
 
