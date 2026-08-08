@@ -574,6 +574,8 @@ function displayFarmerTable() {
 
 <th>शेतकरी</th>
 
+<th>मोबाईल नंबर</th>
+
 <th>गाव</th>
 
 <th>कामाचा प्रकार</th>
@@ -647,6 +649,8 @@ tableBody.innerHTML = html;
             <td>${index + 1}</td>
 
             <td>${farmer.farmerName}</td>
+
+            <td>${farmer.phone || "-"}</td>
 
             <td>${farmer.village}</td>
 
@@ -1014,6 +1018,8 @@ function getCurrentTableData(){
                 "अ. क्र.": index + 1,
 
                 "शेतकरी":f.farmerName,
+
+                "मोबाईल नंबर":f.phone || "-",
 
                 "गाव":f.village,
 
