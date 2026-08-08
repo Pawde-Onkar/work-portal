@@ -1,167 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>New Field Visit</title>
-
-<link rel="stylesheet" href="field-visit.css">
-<link
-href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
-rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>नवीन क्षेत्र भेट - ग्राम महसूल अधिकारी निळा</title>
+    <link rel="stylesheet" href="field-visit.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <nav class="navbar">
 
-    <div class="logo">
-        ग्राम महसूल अधिकारी निळा
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-wheat-awn"></i> ग्राम महसूल अधिकारी निळा
+        </div>
+        <ul class="navbar-links">
+            <li>
+                <a href="gpt.html" id="navbar-home">
+                    <i class="fa-solid fa-house"></i> मुख्यपृष्ठ
+                </a>
+            </li>
+            <li>
+                <a href="field-visit-manager.html" class="active" id="navbar-visit">
+                    <i class="fa-solid fa-clipboard-list"></i> क्षेत्र भेट
+                </a>
+            </li>
+            <li>
+                <a href="account.html" id="navbar-account">
+                    <i class="fa-solid fa-user"></i> माझे खाते
+                </a>
+            </li>
+            <li>
+                <a href="#" id="navbar-logout">
+                    <i class="fa-solid fa-right-from-bracket"></i> बाहेर पडा
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- HEADER -->
+    <header>
+        <h1>
+            <i class="fa-solid fa-square-plus"></i> नवीन क्षेत्र भेट नोंदणी
+        </h1>
+        <a href="field-visit-manager.html" class="nav-btn">
+            <i class="fa-solid fa-arrow-left"></i> मागे
+        </a>
+    </header>
+
+    <!-- FORM CONTAINER -->
+    <div class="container">
+        <form id="fieldVisitForm">
+            <div class="form-group">
+                <label for="farmerName">
+                    <i class="fa-solid fa-user" style="color:#ff7b00;"></i> शेतकऱ्याचे नाव *
+                </label>
+                <input
+                    type="text"
+                    id="farmerName"
+                    placeholder="शेतकऱ्याचे नाव प्रविष्ट करा"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="village">
+                    <i class="fa-solid fa-location-dot" style="color:#ff7b00;"></i> गाव *
+                </label>
+                <input
+                    type="text"
+                    id="village"
+                    placeholder="गावाचे नाव प्रविष्ट करा"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="visitDate">
+                    <i class="fa-regular fa-calendar-days" style="color:#3b82f6;"></i> भेट दिनांक *
+                </label>
+                <input
+                    type="date"
+                    id="visitDate"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="observation">
+                    <i class="fa-solid fa-pen-to-square" style="color:#10b981;"></i> भेटीचा संक्षिप्त तपशील / निरीक्षणे
+                </label>
+                <textarea
+                    id="observation"
+                    rows="4"
+                    placeholder="क्षेत्रभेटीदरम्यान नोंदवलेली निरीक्षणे प्रविष्ट करा..."
+                ></textarea>
+            </div>
+
+            <!-- PHOTOS UPLOAD ZONE -->
+            <div class="form-group">
+                <label>
+                    <i class="fa-solid fa-camera" style="color:#8b5cf6;"></i> फोटो अपलोड करा (जास्तीत जास्त 3 फोटो)
+                </label>
+                <div class="file-dropzone" onclick="document.getElementById('visitPhotos').click()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <p style="font-weight:600; color:#334155; font-size:14px;">इथे क्लिक करा किंवा फोटो निवडा</p>
+                    <p style="color:#94a3b8; font-size:12px; margin-top:4px;">(फोटो ऑटोमॅटिक कॉम्प्रेस केले जातील)</p>
+                </div>
+                <input
+                    type="file"
+                    id="visitPhotos"
+                    accept="image/jpeg,image/jpg,image/png"
+                    multiple
+                    style="display:none;"
+                >
+                <div id="photoPreviewGrid" class="preview-grid"></div>
+            </div>
+
+            <!-- DOCUMENTS UPLOAD ZONE -->
+            <div class="form-group">
+                <label>
+                    <i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i> कागदपत्रे अपलोड करा (जास्तीत जास्त 2 फाईली)
+                </label>
+                <div class="file-dropzone" onclick="document.getElementById('visitDocuments').click()">
+                    <i class="fa-solid fa-file-arrow-up" style="color:#3b82f6;"></i>
+                    <p style="font-weight:600; color:#334155; font-size:14px;">इथे क्लिक करा किंवा कागदपत्रे निवडा (.pdf, .doc, .docx)</p>
+                </div>
+                <input
+                    type="file"
+                    id="visitDocuments"
+                    accept=".pdf,.doc,.docx"
+                    multiple
+                    style="display:none;"
+                >
+                <div id="docPreviewList" style="margin-top:8px; font-size:13px; color:#475569;"></div>
+            </div>
+
+            <!-- LOADER -->
+            <div id="uploadLoader" class="loader-container">
+                <div class="loader"></div>
+                <p style="margin-top:10px; font-weight:600; color:#ff7b00;">क्षेत्रभेटीची माहिती सेव्ह होत आहे...</p>
+            </div>
+
+            <button type="submit">
+                <i class="fa-solid fa-floppy-disk"></i> माहिती सेव्ह करा
+            </button>
+        </form>
     </div>
 
-    <ul class="navbar-links">
-
-        <li>
-            <a href="gpt.html" id="navbar-home">
-                🏠 मुख्यपृष्ठ
-            </a>
-        </li>
-
-        <li>
-            <a href="field-visit-manager.html" id="navbar-visit">
-                📋 क्षेत्र भेट
-            </a>
-        </li>
-
-       
-
-        <li>
-            <a href="account.html" id="navbar-account">
-                👤 माझे खाते
-            </a>
-        </li>
-
-        <li>
-            <a href="#" id="navbar-logout">
-                🚪 बाहेर पडा
-            </a>
-        </li>
-
-    </ul>
-
-</nav>
-
-<header>
-
-    <h1>नवीन क्षेत्र भेट</h1>
-
-    <a href="field-visit-manager.html" class="nav-btn">
-        मागे
-    </a>
-
-</header>
-
-<div class="container">
-
-    <form id="fieldVisitForm">
-
-        <div class="form-group">
-
-            <label>
-शेतकऱ्याचे नाव
-</label>
-
-            <input
-                type="text"
-                id="farmerName"
-                required
-            >
-
-        </div>
-
-        <div class="form-group">
-
-            <label>गाव
-</label>
-
-            <input
-                type="text"
-                id="village"
-                required
-            >
-
-        </div>
-
-        <div class="form-group">
-
-            <label>भेट दिनांक</label>
-
-            <input
-                type="date"
-                id="visitDate"
-                required
-            >
-
-        </div>
-
-
-
-        <div class="form-group">
-
-            <label>भेटीचा संक्षिप्त तपशील</label>
-
-            <textarea
-                id="observation"
-                rows="4"
-                
-            ></textarea>
-
-        </div>
-
-
-
-
-
-        <div class="form-group">
-
-        <label>Upload Photos</label>
-
-       <input
-            type="file"
-            id="visitPhotos"
-            accept="image/jpeg,image/jpg,image/png"
-            multiple
-        >
-        <p class="upload-note">
-     फोटो आपोआप संकुचित (compress) केले जातील.
-</p>
-
-        </div>
-        <div class="form-group">
-
-    <label>Upload Documents</label>
-
-    <input
-         type="file"
-        id="visitDocuments"
-        accept=".pdf,.doc,.docx"
-        multiple
-    >
-
-</div>
-    <div id="uploadLoader" class="loader-container">
-    <div class="loader"></div>
-    <p>क्षेत्रभेटीची माहिती अपलोड होत आहे...</p>
-</div>
-        <button type="submit">
-
-            सेव्ह भेट
-
-        </button>
-
-    </form>
-
-</div>
-
-<script type="module" src="field-visit.js"></script>
+    <script type="module" src="field-visit.js"></script>
 </body>
 </html>

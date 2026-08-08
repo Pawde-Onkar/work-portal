@@ -1,92 +1,74 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="mr">
 <head>
-
-    <title>Field Visit Details</title>
-
-    <link rel="stylesheet"
-          href="field-visit.css">
-    <link
-href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
-rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>क्षेत्र भेट माहिती - ग्राम महसूल अधिकारी निळा</title>
+    <link rel="stylesheet" href="field-visit.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-
 <body>
+
+    <!-- NAVBAR -->
     <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-wheat-awn"></i> ग्राम महसूल अधिकारी निळा
+        </div>
+        <ul class="navbar-links">
+            <li>
+                <a href="gpt.html" id="navbar-home">
+                    <i class="fa-solid fa-house"></i> मुख्यपृष्ठ
+                </a>
+            </li>
+            <li>
+                <a href="field-visit-manager.html" class="active" id="navbar-visit">
+                    <i class="fa-solid fa-clipboard-list"></i> क्षेत्र भेट
+                </a>
+            </li>
+            <li>
+                <a href="account.html" id="navbar-account">
+                    <i class="fa-solid fa-user"></i> माझे खाते
+                </a>
+            </li>
+            <li>
+                <a href="#" id="navbar-logout">
+                    <i class="fa-solid fa-right-from-bracket"></i> बाहेर पडा
+                </a>
+            </li>
+        </ul>
+    </nav>
 
-    <div class="logo">
-        ग्राम महसूल अधिकारी निळा
+    <!-- HEADER -->
+    <header>
+        <h1>
+            <i class="fa-solid fa-file-circle-check"></i> क्षेत्रभेटीचा सविस्तर तपशील
+        </h1>
+        <div style="display:flex; gap:10px;">
+            <a href="field-visit-manager.html" class="nav-btn" style="background:rgba(255,255,255,0.2); box-shadow:none;">
+                <i class="fa-solid fa-arrow-left"></i> मागे
+            </a>
+            <button onclick="generatePDFReport()" class="nav-btn">
+                <i class="fa-solid fa-file-pdf"></i> PDF अहवाल
+            </button>
+            <button onclick="generateWordReport()" class="nav-btn" style="background:linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);">
+                <i class="fa-solid fa-file-word"></i> Word अहवाल
+            </button>
+        </div>
+    </header>
+
+    <!-- DETAILS CONTAINER -->
+    <div class="container">
+        <div id="visitDetails">
+            <!-- Rendered by field-visit-details.js -->
+        </div>
     </div>
 
-    <ul class="navbar-links">
-
-        <li>
-            <a href="gpt.html" id="navbar-home">
-                🏠 मुख्यपृष्ठ
-            </a>
-        </li>
-
-        <li>
-            <a href="field-visit-manager.html" id="navbar-visit">
-                📋 क्षेत्र भेट
-            </a>
-        </li>
-
-       
-
-        <li>
-            <a href="account.html" id="navbar-account">
-                👤 माझे खाते
-            </a>
-        </li>
-
-        <li>
-            <a href="#" id="navbar-logout">
-                🚪 बाहेर पडा
-            </a>
-        </li>
-
-    </ul>
-
-</nav>
-
-<header>
-
-    <h1>क्षेत्रभेटीची माहिती</h1>
-
-</header>
-
-<div class="container">
-
-    <div id="visitDetails">
-
-    </div>
-
-    <br>
-
-    <a href="field-visit-manager.html"
-       class="nav-btn">
-
-       Back
-
-    </a>
-    <button onclick="generateWordReport()">
-
-    Generate Word Report
-
-    </button>
-    
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
-<script>
-console.log("DOCX =", window.docx);
-</script>
-<script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script type="module" src="field-visit-details.js"></script>
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script type="module" src="field-visit-details.js"></script>
 </body>
-
 </html>
