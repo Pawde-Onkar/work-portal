@@ -1198,7 +1198,7 @@ function exportExcel() {
 // EXPORT PDF
 // ==========================================
 
-function exportPDF() {
+async function exportPDF() {
 
     const data = getCurrentTableData();
 
@@ -1210,71 +1210,110 @@ function exportPDF() {
 
     }
 
-    const { jsPDF } = window.jspdf;
+    downloadModal.style.display = "none";
 
-    const doc = new jsPDF({
-
-        orientation: "landscape",
-
-        unit: "mm",
-
-        format: "a4"
-
-    });
-
-    //----------------------------------------------------
-    // Title
-    //----------------------------------------------------
-
-    let title = "Report";
+    let title = "अहवाल";
 
     if (currentReport === "farmers")
-        title = "Farmer Report";
+        title = "शेतकरी अहवाल";
 
     if (currentReport === "villages")
-        title = "Village Summary";
+        title = "गावनिहाय अहवाल";
 
     if (currentReport === "worktypes")
-        title = "Work Type Summary";
+        title = "कामाच्या प्रकारानुसार अहवाल";
 
-    doc.setFontSize(18);
+    // Create printable container offscreen
+    const printArea = document.createElement("div");
+    printArea.style.position = "absolute";
+    printArea.style.left = "-9999px";
+    printArea.style.top = "0";
+    printArea.style.width = "1100px";
+    printArea.style.padding = "25px";
+    printArea.style.backgroundColor = "#ffffff";
+    printArea.style.fontFamily = "'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif";
 
-    doc.text(title, 14, 15);
+    // Title
+    const titleEl = document.createElement("h2");
+    titleEl.textContent = title;
+    titleEl.style.textAlign = "center";
+    titleEl.style.color = "#333333";
+    titleEl.style.marginBottom = "20px";
+    titleEl.style.fontSize = "24px";
+    printArea.appendChild(titleEl);
 
-    //----------------------------------------------------
-    // Table
-    //----------------------------------------------------
+    // Clone table
+    const originalTable = document.getElementById("reportTable");
+    const tableClone = originalTable.cloneNode(true);
+    tableClone.style.width = "100%";
+    tableClone.style.borderCollapse = "collapse";
+    tableClone.style.fontSize = "13px";
 
-    const headers = [Object.keys(data[0])];
-
-    const rows = data.map(row => Object.values(row));
-
-    doc.autoTable({
-
-        head: headers,
-
-        body: rows,
-
-        startY: 25,
-
-        styles: {
-
-            fontSize: 9,
-
-            halign: "center"
-
-        },
-
-        headStyles: {
-
-            fillColor: [255,123,0]
-
-        }
-
+    // Styling
+    const ths = tableClone.querySelectorAll("th");
+    ths.forEach(th => {
+        th.style.background = "#ff7b00";
+        th.style.color = "#ffffff";
+        th.style.padding = "10px 8px";
+        th.style.border = "1px solid #cccccc";
+        th.style.textAlign = "center";
     });
 
-    doc.save(title + ".pdf");
+    const tds = tableClone.querySelectorAll("td");
+    tds.forEach(td => {
+        td.style.padding = "8px 6px";
+        td.style.border = "1px solid #cccccc";
+        td.style.color = "#333333";
+        td.style.textAlign = "center";
+    });
 
-    downloadModal.style.display = "none";
+    printArea.appendChild(tableClone);
+    document.body.appendChild(printArea);
+
+    try {
+        const canvas = await html2canvas(printArea, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff"
+        });
+
+        document.body.removeChild(printArea);
+
+        const imgData = canvas.toDataURL("image/png");
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: "landscape",
+            unit: "mm",
+            format: "a4"
+        });
+
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 10;
+        const imgWidth = pageWidth - (margin * 2);
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let heightLeft = imgHeight;
+        let position = margin;
+
+        pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - (margin * 2));
+
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight + margin;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - (margin * 2));
+        }
+
+        pdf.save(`${title}.pdf`);
+
+    } catch (error) {
+        console.error("PDF Export error:", error);
+        if (printArea.parentNode) {
+            document.body.removeChild(printArea);
+        }
+        alert("PDF तयार करताना त्रुटी आली.");
+    }
 
 }
